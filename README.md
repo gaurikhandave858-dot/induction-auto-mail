@@ -39,6 +39,11 @@ This Java-based desktop application automates the process of tracking employee a
    java -cp "target/classes;target/dependency/*" Main
    ```
 
+Alternative way to run the application:
+   ```
+   mvn exec:java
+   ```
+
 ## Configuration
 
 The application is pre-configured with the following email settings:
