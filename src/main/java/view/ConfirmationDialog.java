@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -25,11 +26,12 @@ public class ConfirmationDialog extends JDialog {
     private void initializeComponents(String message) {
         setLayout(new BorderLayout());
         
-        // Message panel
-        JPanel messagePanel = new JPanel();
+        // Message panel with increased padding
+        JPanel messagePanel = new JPanel(new BorderLayout());
         JLabel messageLabel = new JLabel(message, SwingConstants.CENTER);
         messageLabel.setFont(messageLabel.getFont().deriveFont(16.0f)); // Increase font size
-        messagePanel.add(messageLabel);
+        messageLabel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Add padding around the text
+        messagePanel.add(messageLabel, BorderLayout.CENTER);
         
         // Button panel
         JPanel buttonPanel = new JPanel(new FlowLayout());
