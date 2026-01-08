@@ -18,7 +18,7 @@ public class ConfirmationDialog extends JDialog {
         initializeComponents(message);
         setupLayout();
         setupEventHandlers();
-        setSize(300, 150);
+        setSize(500, 250);
         setLocationRelativeTo(parent);
     }
     
@@ -27,12 +27,18 @@ public class ConfirmationDialog extends JDialog {
         
         // Message panel
         JPanel messagePanel = new JPanel();
-        messagePanel.add(new JLabel(message, SwingConstants.CENTER));
+        JLabel messageLabel = new JLabel(message, SwingConstants.CENTER);
+        messageLabel.setFont(messageLabel.getFont().deriveFont(16.0f)); // Increase font size
+        messagePanel.add(messageLabel);
         
         // Button panel
         JPanel buttonPanel = new JPanel(new FlowLayout());
         JButton btnYes = new JButton("Yes");
         JButton btnNo = new JButton("No");
+        
+        // Increase font size for better visibility
+        btnYes.setFont(btnYes.getFont().deriveFont(14.0f));
+        btnNo.setFont(btnNo.getFont().deriveFont(14.0f));
         
         buttonPanel.add(btnYes);
         buttonPanel.add(btnNo);
