@@ -38,13 +38,17 @@ public class ExcelProcessor {
             
             Sheet sheet = workbook.getSheetAt(0);
             
-            // Find header row (first non-empty row)
+            // Find header row (first non-empty row with actual data columns)
             Row headerRow = null;
             for (int i = 0; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
                 if (row != null && !isRowEmpty(row)) {
-                    headerRow = row;
-                    break;
+                    // Look for the row that contains the actual column headers (Sr No, Name, etc.)
+                    // This should be after any training/module description rows
+                    if (hasDataColumns(row)) {
+                        headerRow = row;
+                        break;
+                    }
                 }
             }
             
@@ -53,44 +57,47 @@ public class ExcelProcessor {
             }
             
             // Identify column indices by header names
-            int srNoCol = -1, nameCol = -1, contactNoCol = -1, day1Col = -1, day2Col = -1;
-            String day1Date = "", day2Date = "";
+            int srNoCol = -1, pNoCol = -1, nameCol = -1, genderCol = -1, tradeCol = -1, mobileNoCol = -1;
+            int preTestCol = -1, postTestCol = -1, reExamCol = -1, deployShopCol = -1;
+            
+            // List to hold all date columns (attendance columns)
+            List<Integer> dateCols = new ArrayList<>();
+            List<String> dateHeaders = new ArrayList<>();
             
             for (Cell cell : headerRow) {
-                String header = getCellValueAsString(cell).trim();
+                String header = getCellValueAsString(cell).trim().toLowerCase();
                 
-                // Find Sr. No column - with more variations
-                if (header.toLowerCase().contains("sr") || header.toLowerCase().contains("serial") || 
-                    header.toLowerCase().contains("no") || header.equalsIgnoreCase("srno") ||
-                    header.toLowerCase().contains("number") || header.toLowerCase().startsWith("sr")) {
+                // Find various column types
+                if (header.contains("sr") && (header.contains("no") || header.contains("num"))) {
                     srNoCol = cell.getColumnIndex();
-                }
-                // Find Name column - with more variations
-                else if (header.toLowerCase().contains("name") || header.equalsIgnoreCase("employee") || 
-                         header.equalsIgnoreCase("emp") || header.toLowerCase().startsWith("name")) {
+                } else if (header.contains("p") && header.contains("no")) {
+                    pNoCol = cell.getColumnIndex();
+                } else if (header.contains("name") && !header.contains("post") && !header.contains("pre")) {
                     nameCol = cell.getColumnIndex();
-                }
-                // Find Contact No column - with more variations
-                else if (header.toLowerCase().contains("contact") || header.toLowerCase().contains("phone") || 
-                         header.toLowerCase().contains("mobile") || header.toLowerCase().contains("tel") || 
-                         header.toLowerCase().contains("number") || header.toLowerCase().contains("no")) {
-                    contactNoCol = cell.getColumnIndex();
-                }
-                // Find Day 1 column by looking for date patterns
-                else if (isDateColumn(header) && day1Col == -1) { // First date column found becomes Day 1
-                    day1Col = cell.getColumnIndex();
-                    day1Date = header; // Store the full header which contains the date
-                }
-                // Find Day 2 column by looking for date patterns
-                else if (isDateColumn(header) && day1Col != -1 && day2Col == -1) { // Second date column found becomes Day 2
-                    day2Col = cell.getColumnIndex();
-                    day2Date = header; // Store the full header which contains the date
+                } else if (header.contains("gender")) {
+                    genderCol = cell.getColumnIndex();
+                } else if (header.contains("trade")) {
+                    tradeCol = cell.getColumnIndex();
+                } else if (header.contains("mobile") || header.contains("contact") || (header.contains("no") && !header.contains("sr") && !header.contains("p"))) {
+                    mobileNoCol = cell.getColumnIndex();
+                } else if (header.contains("pre") && header.contains("test")) {
+                    preTestCol = cell.getColumnIndex();
+                } else if (header.contains("post") && header.contains("test")) {
+                    postTestCol = cell.getColumnIndex();
+                } else if (header.contains("re") && header.contains("exam")) {
+                    reExamCol = cell.getColumnIndex();
+                } else if (header.contains("deploy") && header.contains("shop")) {
+                    deployShopCol = cell.getColumnIndex();
+                } else if (isDateColumn(header)) {
+                    // This is a date column, add to our list of date columns
+                    dateCols.add(cell.getColumnIndex());
+                    dateHeaders.add(getCellValueAsString(cell).trim()); // Store the original header
                 }
             }
             
-            // Validate that we found required columns
-            if (srNoCol == -1 || nameCol == -1 || day1Col == -1 || day2Col == -1) {
-                throw new IOException("Required columns not found. Excel file must contain: Sr. No, Name, and 2 date columns (e.g., 08/01/2026, 09/01/2026)");
+            // Validate that we found required columns (at least Sr No, Name, and 2 date columns)
+            if (srNoCol == -1 || nameCol == -1 || dateCols.size() < 2) {
+                throw new IOException("Required columns not found. Excel file must contain: Sr No, Name, and at least 2 date columns (e.g., 16-Dec, 17-Dec)");
             }
             
             // Process data rows
@@ -117,6 +124,14 @@ public class ExcelProcessor {
                     }
                 }
                 
+                // Get P No (if exists)
+                if (pNoCol < row.getLastCellNum() && pNoCol != -1) {
+                    Cell cell = row.getCell(pNoCol);
+                    if (cell != null) {
+                        employee.setPNo(getCellValueAsString(cell));
+                    }
+                }
+                
                 // Get Name
                 if (nameCol < row.getLastCellNum()) {
                     Cell cell = row.getCell(nameCol);
@@ -125,29 +140,91 @@ public class ExcelProcessor {
                     }
                 }
                 
-                // Get Contact No
-                if (contactNoCol < row.getLastCellNum() && contactNoCol != -1) { // contact no is optional
-                    Cell cell = row.getCell(contactNoCol);
+                // Get Gender (if exists)
+                if (genderCol < row.getLastCellNum() && genderCol != -1) {
+                    Cell cell = row.getCell(genderCol);
                     if (cell != null) {
-                        employee.setContactNo(getCellValueAsString(cell));
+                        employee.setGender(getCellValueAsString(cell));
                     }
                 }
                 
-                // Get Day 1 Attendance
-                if (day1Col < row.getLastCellNum()) {
-                    Cell cell = row.getCell(day1Col);
+                // Get Trade (if exists)
+                if (tradeCol < row.getLastCellNum() && tradeCol != -1) {
+                    Cell cell = row.getCell(tradeCol);
                     if (cell != null) {
-                        employee.setDay1Attendance(getCellValueAsString(cell));
-                        employee.setDay1Date(day1Date); // Set the date information
+                        employee.setTrade(getCellValueAsString(cell));
                     }
                 }
                 
-                // Get Day 2 Attendance
-                if (day2Col < row.getLastCellNum()) {
-                    Cell cell = row.getCell(day2Col);
+                // Get Mobile No (if exists)
+                if (mobileNoCol < row.getLastCellNum() && mobileNoCol != -1) {
+                    Cell cell = row.getCell(mobileNoCol);
                     if (cell != null) {
-                        employee.setDay2Attendance(getCellValueAsString(cell));
-                        employee.setDay2Date(day2Date); // Set the date information
+                        employee.setMobileNo(getCellValueAsString(cell));
+                    }
+                }
+                
+                // Get Pre-Test (if exists)
+                if (preTestCol < row.getLastCellNum() && preTestCol != -1) {
+                    Cell cell = row.getCell(preTestCol);
+                    if (cell != null) {
+                        employee.setPreTest(getCellValueAsString(cell));
+                    }
+                }
+                
+                // Get Post-Test (if exists)
+                if (postTestCol < row.getLastCellNum() && postTestCol != -1) {
+                    Cell cell = row.getCell(postTestCol);
+                    if (cell != null) {
+                        employee.setPostTest(getCellValueAsString(cell));
+                    }
+                }
+                
+                // Get Re-Exam (if exists)
+                if (reExamCol < row.getLastCellNum() && reExamCol != -1) {
+                    Cell cell = row.getCell(reExamCol);
+                    if (cell != null) {
+                        employee.setReExam(getCellValueAsString(cell));
+                    }
+                }
+                
+                // Get Deploy Shop (if exists)
+                if (deployShopCol < row.getLastCellNum() && deployShopCol != -1) {
+                    Cell cell = row.getCell(deployShopCol);
+                    if (cell != null) {
+                        employee.setDeployShop(getCellValueAsString(cell));
+                    }
+                }
+                
+                // Process attendance for each date column
+                if (dateCols.size() > 0) {
+                    // For backward compatibility, assign first two date columns to Day1 and Day2
+                    if (dateCols.size() > 0) {
+                        Cell cell = row.getCell(dateCols.get(0));
+                        if (cell != null) {
+                            employee.setDay1Attendance(getCellValueAsString(cell));
+                            employee.setDay1Date(dateHeaders.get(0));
+                        }
+                    }
+                    
+                    if (dateCols.size() > 1) {
+                        Cell cell = row.getCell(dateCols.get(1));
+                        if (cell != null) {
+                            employee.setDay2Attendance(getCellValueAsString(cell));
+                            employee.setDay2Date(dateHeaders.get(1));
+                        }
+                    }
+                    
+                    // Store all date attendances for future use
+                    employee.setAllDateAttendances(new ArrayList<>());
+                    employee.setAllDateHeaders(new ArrayList<>());
+                    
+                    for (int j = 0; j < dateCols.size(); j++) {
+                        Cell cell = row.getCell(dateCols.get(j));
+                        if (cell != null) {
+                            employee.getAllDateAttendances().add(getCellValueAsString(cell));
+                            employee.getAllDateHeaders().add(dateHeaders.get(j));
+                        }
                     }
                 }
                 
@@ -162,137 +239,7 @@ public class ExcelProcessor {
         return employees;
     }
     
-    /**
-     * Updates the master Excel sheet with attendance records
-     */
-    public void updateMasterSheet(List<EmailRecord> emailRecords, String masterFilePath) throws IOException {
-        Workbook workbook;
-        
-        // Try to open existing file, if it doesn't exist create new one
-        try (FileInputStream fis = new FileInputStream(masterFilePath)) {
-            if (masterFilePath.endsWith(".xlsx")) {
-                workbook = new XSSFWorkbook(fis);
-            } else if (masterFilePath.endsWith(".xls")) {
-                workbook = new HSSFWorkbook(fis);
-            } else {
-                workbook = new XSSFWorkbook(); // Default to xlsx
-            }
-        } catch (IOException e) {
-            // File doesn't exist, create new workbook
-            workbook = new XSSFWorkbook();
-        }
-        
-        Sheet sheet = workbook.getSheet("AttendanceSummary");
-        if (sheet == null) {
-            sheet = workbook.createSheet("AttendanceSummary");
-        }
-        
-        // Create header row if it's a new sheet
-        if (sheet.getLastRowNum() == 0) {
-            Row headerRow = sheet.createRow(0);
-            headerRow.createCell(0).setCellValue("Record Info");
-            headerRow.createCell(1).setCellValue("Value");
-        }
-        
-        // Add new records in vertical format
-        int lastRowNum = sheet.getLastRowNum();
-        for (EmailRecord record : emailRecords) {
-            // Row 1: Date
-            Row dateRow = sheet.createRow(lastRowNum + 1);
-            dateRow.createCell(0).setCellValue("Date");
-            dateRow.createCell(1).setCellValue(record.getDate());
-            
-            // Row 2: Day 1 Present Count
-            Row row1 = sheet.createRow(lastRowNum + 2);
-            row1.createCell(0).setCellValue("Day 1 Present Count");
-            row1.createCell(1).setCellValue(record.getDay1PresentCount());
-            
-            // Row 3: Day 1 Absent Count
-            Row row2 = sheet.createRow(lastRowNum + 3);
-            row2.createCell(0).setCellValue("Day 1 Absent Count");
-            row2.createCell(1).setCellValue(record.getDay1AbsentCount());
-            
-            // Row 4: Day 1 Absent Names
-            Row row3 = sheet.createRow(lastRowNum + 4);
-            row3.createCell(0).setCellValue("Day 1 Absent Names");
-            row3.createCell(1).setCellValue(record.getDay1AbsentNames());
-            
-            // Row 5: Day 2 Present Count
-            Row row4 = sheet.createRow(lastRowNum + 5);
-            row4.createCell(0).setCellValue("Day 2 Present Count");
-            row4.createCell(1).setCellValue(record.getDay2PresentCount());
-            
-            // Row 6: Day 2 Absent Count
-            Row row5 = sheet.createRow(lastRowNum + 6);
-            row5.createCell(0).setCellValue("Day 2 Absent Count");
-            row5.createCell(1).setCellValue(record.getDay2AbsentCount());
-            
-            // Row 7: Day 2 Absent Names
-            Row row6 = sheet.createRow(lastRowNum + 7);
-            row6.createCell(0).setCellValue("Day 2 Absent Names");
-            row6.createCell(1).setCellValue(record.getDay2AbsentNames());
-            
-            // Row 8: Report Generated On date
-            Row row7 = sheet.createRow(lastRowNum + 8);
-            row7.createCell(0).setCellValue("Report Generated On date");
-            row7.createCell(1).setCellValue(java.time.LocalDate.now().toString());
-            
-            // Row 9: Complete Email Content (formatted like the email summary)
-            String emailContent = "EMAIL SUMMARY CONTENT\n\n" +
-                                 "Report Generated On: " + java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "\n\n" +
-                                 "Day 1:\n" +
-                                 "Day 1 (" + (record.getDay1DateString() != null ? record.getDay1DateString() : "") + ") Summary:\n" +
-                                 "Present: " + record.getDay1PresentCount() + "\n" +
-                                 "Absent: " + record.getDay1AbsentCount() + "\n\n" +
-                                 "Day 1 (" + (record.getDay1DateString() != null ? record.getDay1DateString() : "") + ") Absent Employee List:\n\n";
-            
-            if (!record.getDay1AbsentNames().isEmpty()) {
-                String[] day1Names = record.getDay1AbsentNames().split(", ");
-                for (String name : day1Names) {
-                    if (!name.trim().isEmpty()) {
-                        emailContent += "- " + name.trim() + "\n";
-                    }
-                }
-            } else {
-                emailContent += "- None\n";
-            }
-            
-            emailContent += "\n" +
-                             "Day 2 (" + (record.getDay2DateString() != null ? record.getDay2DateString() : "") + ") Summary:\n" +
-                             "Present: " + record.getDay2PresentCount() + "\n" +
-                             "Absent: " + record.getDay2AbsentCount() + "\n\n" +
-                             "Day 2 (" + (record.getDay2DateString() != null ? record.getDay2DateString() : "") + ") Absent Employee List:\n\n";
-            
-            if (!record.getDay2AbsentNames().isEmpty()) {
-                String[] day2Names = record.getDay2AbsentNames().split(", ");
-                for (String name : day2Names) {
-                    if (!name.trim().isEmpty()) {
-                        emailContent += "- " + name.trim() + "\n";
-                    }
-                }
-            } else {
-                emailContent += "- None\n";
-            }
-            
-            Row row8 = sheet.createRow(lastRowNum + 9);
-            row8.createCell(0).setCellValue("Complete Email Content");
-            row8.createCell(1).setCellValue(emailContent);
-            
-            // Add a blank row for spacing between records
-            Row spacingRow = sheet.createRow(lastRowNum + 10);
-            spacingRow.createCell(0).setCellValue("");
-            spacingRow.createCell(1).setCellValue("");
-            
-            lastRowNum += 10; // Move to next position (9 data rows + 1 spacing row)
-        }
-        
-        // Write to file
-        try (FileOutputStream fileOut = new FileOutputStream(masterFilePath)) {
-            workbook.write(fileOut);
-        }
-        
-        workbook.close();
-    }
+
     
     /**
      * Gets cell value as string regardless of cell type
@@ -366,6 +313,36 @@ public class ExcelProcessor {
     }
     
     /**
+     * Checks if a row contains data columns (like Sr No, Name, etc.)
+     * Used to skip training/module description rows at the top of the Excel sheet
+     */
+    private boolean hasDataColumns(Row row) {
+        if (row == null) return false;
+        
+        for (Cell cell : row) {
+            String header = getCellValueAsString(cell).toLowerCase().trim();
+            
+            // Check for common data column headers
+            if (header.contains("sr") && (header.contains("no") || header.contains("num")) ||
+                header.contains("p") && header.contains("no") ||
+                header.contains("name") ||
+                header.contains("gender") ||
+                header.contains("trade") ||
+                header.contains("mobile") ||
+                header.contains("contact") ||
+                header.contains("no") && !header.contains("module") ||
+                header.contains("pre") && header.contains("test") ||
+                header.contains("post") && header.contains("test") ||
+                header.contains("re") && header.contains("exam") ||
+                header.contains("deploy") && header.contains("shop") ||
+                isDateColumn(header)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
      * Checks if a column header represents a date
      * Looks for common date patterns in the header
      */
@@ -400,12 +377,34 @@ public class ExcelProcessor {
             return true;
         }
         
+        // Check for date-like formats in brackets or parentheses
+        if (lowerHeader.contains("(") && lowerHeader.contains(")")) {
+            int start = lowerHeader.indexOf('(');
+            int end = lowerHeader.indexOf(')');
+            String insideBrackets = lowerHeader.substring(start + 1, end);
+            
+            if (insideBrackets.matches("\\d{1,2}[\\/-]\\d{1,2}[\\/-]\\d{2,4}")) {
+                return true;
+            }
+        }
+        
         // Additional check for date in parentheses format
         if (origHeader.contains("(") && origHeader.contains(")")) {
             int start = origHeader.indexOf('(');
             int end = origHeader.indexOf(')');
             String insideBrackets = origHeader.substring(start + 1, end);
-            if (insideBrackets.matches("\\d{1,2}[\\\\/-]\\d{1,2}[\\\\/-]\\d{2,4}")) {
+            if (insideBrackets.matches("\\\\d{1,2}[\\\\/-]\\\\d{1,2}[\\\\/-]\\\\d{2,4}")) {
+                return true;
+            }
+        }
+        
+        // Check for date-like formats in brackets or parentheses
+        if (lowerHeader.contains("(") && lowerHeader.contains(")")) {
+            int start = lowerHeader.indexOf('(');
+            int end = lowerHeader.indexOf(')');
+            String insideBrackets = lowerHeader.substring(start + 1, end);
+            
+            if (insideBrackets.matches("\\\\d{1,2}[\\\\/-]\\\\d{1,2}[\\\\/-]\\\\d{2,4}")) {
                 return true;
             }
         }
@@ -433,15 +432,9 @@ public class ExcelProcessor {
             }
         }
         
-        // Check for date-like formats in brackets or parentheses
-        if (lowerHeader.contains("(") && lowerHeader.contains(")")) {
-            int start = lowerHeader.indexOf('(');
-            int end = lowerHeader.indexOf(')');
-            String insideBrackets = lowerHeader.substring(start + 1, end);
-            
-            if (insideBrackets.matches("\\d{1,2}[\\\\/-]\\d{1,2}[\\\\/-]\\d{2,4}")) {
-                return true;
-            }
+        // Additional check for dd-MMM format (e.g., 16-Dec, 17-Dec) as specified in SRS
+        if (lowerHeader.matches("\\d{1,2}-[a-z]{3}")) {
+            return true;
         }
         
         return false;
@@ -580,40 +573,41 @@ public class ExcelProcessor {
         workbook.close();
     }
     
-    /**
-     * Inserts email summary content into an existing Excel sheet starting from the next available row
-     */
-    public void insertEmailSummaryIntoExistingSheet(EmailRecord record, String masterFilePath, int startRow) throws IOException {
+    public void insertEmailSummaryIntoExistingSheet(EmailRecord record, String masterFilePath, int startRowNum) throws IOException {
+        FileInputStream fis = new FileInputStream(masterFilePath);
         Workbook workbook;
         
-        // Open existing file
-        try (FileInputStream fis = new FileInputStream(masterFilePath)) {
-            if (masterFilePath.endsWith(".xlsx")) {
-                workbook = new XSSFWorkbook(fis);
-            } else if (masterFilePath.endsWith(".xls")) {
-                workbook = new HSSFWorkbook(fis);
-            } else {
-                throw new IOException("Unsupported file format. Please use .xls or .xlsx files.");
-            }
+        // Determine file type and create appropriate workbook
+        if (masterFilePath.endsWith(".xlsx")) {
+            workbook = new XSSFWorkbook(fis);
+        } else if (masterFilePath.endsWith(".xls")) {
+            workbook = new HSSFWorkbook(fis);
+        } else {
+            fis.close();
+            throw new IOException("Unsupported file format. Please use .xls or .xlsx files.");
         }
         
-        Sheet sheet = workbook.getSheetAt(0); // Use first sheet
+        fis.close();
         
-        // Find the next available row to append data (after any existing content)
-        int lastRowNum = sheet.getLastRowNum();
-        int currentRow = Math.max(lastRowNum + 1, startRow); // Use either the next empty row or startRow, whichever is greater
+        Sheet sheet = workbook.getSheetAt(0);
         
-        // Create font styles for bold text
+        // If sheet doesn't exist, create one
+        if (sheet == null) {
+            sheet = workbook.createSheet("AttendanceSummary");
+        }
+        
+        // Get or create a bold font style
         Font boldFont = workbook.createFont();
         boldFont.setBold(true);
-        
-        // Create cell style for bold text
         CellStyle boldStyle = workbook.createCellStyle();
         boldStyle.setFont(boldFont);
         
+        // Find the last row to add new content
+        int currentRow = startRowNum;
+        
         // Add a blank row before the new summary for separation
-        if (lastRowNum >= 0) { // If there's existing content
-            currentRow++;
+        if (sheet.getLastRowNum() >= 0) { // If there's existing content
+            currentRow = sheet.getLastRowNum() + 2; // Leave one blank row for separation
         }
         
         // EMAIL SUMMARY CONTENT (bold)
@@ -626,8 +620,8 @@ public class ExcelProcessor {
         row = sheet.createRow(currentRow++);
         cell = row.createCell(0);
         cell.setCellValue("");
-        
-        // Report Generated On line
+
+        // Report Generated On line        
         row = sheet.createRow(currentRow++);
         cell = row.createCell(0);
         cell.setCellValue("Report Generated On: " + java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
@@ -636,12 +630,12 @@ public class ExcelProcessor {
         row = sheet.createRow(currentRow++);
         cell = row.createCell(0);
         cell.setCellValue("");
-        
+
         // Blank row
         row = sheet.createRow(currentRow++);
         cell = row.createCell(0);
         cell.setCellValue("");
-        
+
         // Day 1 header
         row = sheet.createRow(currentRow++);
         cell = row.createCell(0);
@@ -666,7 +660,7 @@ public class ExcelProcessor {
         row = sheet.createRow(currentRow++);
         cell = row.createCell(0);
         cell.setCellValue("");
-        
+
         // Day 1 Absent Employee List header
         row = sheet.createRow(currentRow++);
         cell = row.createCell(0);
@@ -676,7 +670,7 @@ public class ExcelProcessor {
         row = sheet.createRow(currentRow++);
         cell = row.createCell(0);
         cell.setCellValue("");
-        
+
         // Day 1 Absent Employee List
         if (!record.getDay1AbsentNames().isEmpty()) {
             String[] day1Names = record.getDay1AbsentNames().split(", ");
@@ -692,17 +686,17 @@ public class ExcelProcessor {
             cell = row.createCell(0);
             cell.setCellValue("- None");
         }
-        
+
         // Blank row
         row = sheet.createRow(currentRow++);
         cell = row.createCell(0);
         cell.setCellValue("");
-        
+
         // Blank row
         row = sheet.createRow(currentRow++);
         cell = row.createCell(0);
         cell.setCellValue("");
-        
+
         // Day 2 section with date and summary
         row = sheet.createRow(currentRow++);
         cell = row.createCell(0);
@@ -722,7 +716,7 @@ public class ExcelProcessor {
         row = sheet.createRow(currentRow++);
         cell = row.createCell(0);
         cell.setCellValue("");
-        
+
         // Day 2 Absent Employee List header
         row = sheet.createRow(currentRow++);
         cell = row.createCell(0);
@@ -732,7 +726,7 @@ public class ExcelProcessor {
         row = sheet.createRow(currentRow++);
         cell = row.createCell(0);
         cell.setCellValue("");
-        
+
         // Day 2 Absent Employee List
         if (!record.getDay2AbsentNames().isEmpty()) {
             String[] day2Names = record.getDay2AbsentNames().split(", ");
@@ -748,12 +742,58 @@ public class ExcelProcessor {
             cell = row.createCell(0);
             cell.setCellValue("- None");
         }
-        
+
         // Write to file
         try (FileOutputStream fileOut = new FileOutputStream(masterFilePath)) {
             workbook.write(fileOut);
         }
-        
+
         workbook.close();
     }
+    
+    public void updateMasterSheet(List<EmailRecord> records, String fileName) throws IOException {
+        // Create a new workbook
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("AttendanceSummary");
+        
+        // Create font styles
+        Font boldFont = workbook.createFont();
+        boldFont.setBold(true);
+        CellStyle boldStyle = workbook.createCellStyle();
+        boldStyle.setFont(boldFont);
+        
+        // Add header row
+        Row headerRow = sheet.createRow(0);
+        Cell headerCell = headerRow.createCell(0);
+        headerCell.setCellValue("Master Attendance Summary");
+        headerCell.setCellStyle(boldStyle);
+        
+        // Add initial data if any records exist
+        int rowNum = 2; // Start after header and blank row
+        for (EmailRecord record : records) {
+            Row row = sheet.createRow(rowNum++);
+            Cell cell = row.createCell(0);
+            cell.setCellValue("Date: " + record.getDate());
+            
+            row = sheet.createRow(rowNum++);
+            cell = row.createCell(0);
+            cell.setCellValue("Day 1 - Present: " + record.getDay1PresentCount() + ", Absent: " + record.getDay1AbsentCount());
+            
+            row = sheet.createRow(rowNum++);
+            cell = row.createCell(0);
+            cell.setCellValue("Day 2 - Present: " + record.getDay2PresentCount() + ", Absent: " + record.getDay2AbsentCount());
+            
+            rowNum++; // Blank row
+        }
+        
+        // Write to file
+        try (FileOutputStream fileOut = new FileOutputStream(fileName)) {
+            workbook.write(fileOut);
+        }
+        
+        workbook.close();
+        
+        System.out.println("Master sheet updated successfully: " + fileName);
+    }
+    
 }

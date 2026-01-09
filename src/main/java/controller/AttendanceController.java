@@ -83,6 +83,7 @@ public class AttendanceController {
         return tempSender.sendEmail(senderEmail, "Daily Attendance Summary Report (Self Copy)", emailContent);
     }
     
+    
     public void updateMasterSheet() throws IOException {
         if (attendanceSummary != null && emailContent != null) {
             // Create an email record for the master sheet
@@ -101,7 +102,7 @@ public class AttendanceController {
                 record.setDay1DateString(employees.get(0).getDay1Date());
                 record.setDay2DateString(employees.get(0).getDay2Date());
             }
-            
+
             // Insert the email summary in the exact format starting from row 10 in Column A
             excelProcessor.insertEmailSummaryIntoExistingSheet(record, "master_attendance_summary.xlsx", 10);
         }

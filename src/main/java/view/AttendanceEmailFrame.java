@@ -280,13 +280,7 @@ public class AttendanceEmailFrame extends JFrame {
                 txtResult.append("Failed to send self email.\n");
             }
             
-            // Update master sheet
-            try {
-                controller.updateMasterSheet();
-                txtResult.append("Master sheet updated successfully!\n");
-            } catch (Exception ex) {
-                txtResult.append("Failed to update master sheet: " + ex.getMessage() + "\n");
-            }
+
         } else {
             txtResult.append("Failed to send email.\n");
             JOptionPane.showMessageDialog(this, "Failed to send email. Please check your email settings.", 

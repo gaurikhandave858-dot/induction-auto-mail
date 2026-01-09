@@ -1,5 +1,7 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -90,53 +92,123 @@ public class EmailSender {
         return emailContent.toString();
     }
     
-    // Method to generate email with the exact format as specified
+    // Method to generate email with the exact format as specified in SRS
     public String generateAttendanceSummaryEmailWithDates(AttendanceSummary summary, String day1Date, String day2Date) {
         StringBuilder emailContent = new StringBuilder();
         
         emailContent.append("EMAIL SUMMARY CONTENT\n\n");
         emailContent.append("Report Generated On: ").append(java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"))).append("\n\n");
         
-        // Day 1 header
-        emailContent.append("Day 1:\n");
-        
-        // Day 1 Summary with counts
-        emailContent.append("Day 1 (").append(extractDate(day1Date)).append(") Summary:\n");
-        emailContent.append("Present: ").append(summary.getDay1PresentCount()).append("\n");
-        emailContent.append("Absent: ").append(summary.getDay1AbsentCount()).append("\n\n");
-        
-        // Day 1 Absent Employee List
-        emailContent.append("Day 1 (").append(extractDate(day1Date)).append(") Absent Employee List:\n\n");
-        if (!summary.getDay1AbsentNames().isEmpty()) {
-            // Format absent names with each on a new line with dash
-            String[] names = summary.getDay1AbsentNames().split(", ");
-            for (int i = 0; i < names.length; i++) {
-                emailContent.append("- ").append(names[i].trim()).append("\n");
+        // Check if we have multiple date data to process
+        if (!summary.getAllDateHeaders().isEmpty()) {
+            // Process all date columns in the enhanced format
+            List<String> allDateHeaders = summary.getAllDateHeaders();
+            List<Integer> presentCounts = summary.getAllDatePresentCounts();
+            List<Integer> absentCounts = summary.getAllDateAbsentCounts();
+            List<List<String>> absentNamesList = summary.getAllDateAbsentNamesList();
+            
+            for (int i = 0; i < allDateHeaders.size(); i++) {
+                String dateHeader = allDateHeaders.get(i);
+                int presentCount = (i < presentCounts.size()) ? presentCounts.get(i) : 0;
+                int absentCount = (i < absentCounts.size()) ? absentCounts.get(i) : 0;
+                List<String> absentNames = (i < absentNamesList.size()) ? absentNamesList.get(i) : new ArrayList<>();
+                
+                // Format the date properly (extract date from format like "16-Dec")
+                String formattedDate = formatDate(dateHeader);
+                
+                // Add day header (e.g., "Day 1:")
+                emailContent.append("Day ").append(i + 1).append(":\n\n");
+                
+                // Add summary for this day in SRS format
+                emailContent.append("Day ").append(i + 1).append(" (").append(formattedDate).append(") Summary:\n");
+                emailContent.append("Present: ").append(presentCount).append("\n");
+                emailContent.append("Absent: ").append(absentCount).append("\n");
+                
+                // Add absent employee list header for this day
+                emailContent.append("Day ").append(i + 1).append(" (").append(formattedDate).append(") Absent Employee List:\n\n");
+                
+                if (!absentNames.isEmpty()) {
+                    for (String name : absentNames) {
+                        if (name != null && !name.trim().isEmpty()) {
+                            emailContent.append("- ").append(name.trim()).append("\n");
+                        }
+                    }
+                } else {
+                    emailContent.append("- None\n");
+                }
+                emailContent.append("\n");
             }
         } else {
-            emailContent.append("- None\n");
-        }
-        emailContent.append("\n");
-        
-        // Day 2 Summary with counts
-        emailContent.append("Day 2 (").append(extractDate(day2Date)).append(") Summary:\n");
-        emailContent.append("Present: ").append(summary.getDay2PresentCount()).append("\n");
-        emailContent.append("Absent: ").append(summary.getDay2AbsentCount()).append("\n\n");
-        
-        // Day 2 Absent Employee List
-        emailContent.append("Day 2 (").append(extractDate(day2Date)).append(") Absent Employee List:\n\n");
-        if (!summary.getDay2AbsentNames().isEmpty()) {
-            // Format absent names with each on a new line with dash
-            String[] names = summary.getDay2AbsentNames().split(", ");
-            for (int i = 0; i < names.length; i++) {
-                emailContent.append("- ").append(names[i].trim()).append("\n");
+            // Fallback to original logic for backward compatibility
+            
+            // Day 1 header
+            emailContent.append("Day 1:\n\n");
+            
+            // Day 1 Summary with counts in SRS format
+            emailContent.append("Day 1 (").append(extractDate(day1Date)).append(") Summary:\n");
+            emailContent.append("Present: ").append(summary.getDay1PresentCount()).append("\n");
+            emailContent.append("Absent: ").append(summary.getDay1AbsentCount()).append("\n");
+            
+            // Day 1 Absent Employee List header
+            emailContent.append("Day 1 (").append(extractDate(day1Date)).append(") Absent Employee List:\n\n");
+            if (!summary.getDay1AbsentNames().isEmpty()) {
+                // Format absent names with each on a new line with dash
+                String[] names = summary.getDay1AbsentNames().split(", ");
+                for (int i = 0; i < names.length; i++) {
+                    emailContent.append("- ").append(names[i].trim()).append("\n");
+                }
+            } else {
+                emailContent.append("- None\n");
             }
-        } else {
-            emailContent.append("- None\n");
+            emailContent.append("\n");
+            
+            // Day 2 Summary with counts in SRS format
+            emailContent.append("Day 2 (").append(extractDate(day2Date)).append(") Summary:\n");
+            emailContent.append("Present: ").append(summary.getDay2PresentCount()).append("\n");
+            emailContent.append("Absent: ").append(summary.getDay2AbsentCount()).append("\n");
+            
+            // Day 2 Absent Employee List header
+            emailContent.append("Day 2 (").append(extractDate(day2Date)).append(") Absent Employee List:\n\n");
+            if (!summary.getDay2AbsentNames().isEmpty()) {
+                // Format absent names with each on a new line with dash
+                String[] names = summary.getDay2AbsentNames().split(", ");
+                for (int i = 0; i < names.length; i++) {
+                    emailContent.append("- ").append(names[i].trim()).append("\n");
+                }
+            } else {
+                emailContent.append("- None\n");
+            }
+            emailContent.append("\n");
         }
-        emailContent.append("\n");
         
         return emailContent.toString();
+    }
+    
+    // Helper method to format date from various formats (e.g., "16-Dec" -> "16-Dec-2025")
+    private String formatDate(String dateHeader) {
+        if (dateHeader == null || dateHeader.isEmpty()) {
+            return "N/A";
+        }
+        
+        // If the date is already in the format like "16-Dec-2025", return as is
+        if (dateHeader.matches("\\d{1,2}-[A-Za-z]{3}-\\d{4}")) {
+            return dateHeader;
+        }
+        
+        // If the date is in the format like "16-Dec", add the year
+        if (dateHeader.matches("\\d{1,2}-[A-Za-z]{3}")) {
+            // Add a reasonable default year (current year or based on context)
+            return dateHeader + "-" + java.time.LocalDate.now().getYear();
+        }
+        
+        // Extract date from format like "Day 1 (05/01/2026)" or similar
+        if (dateHeader.contains("(") && dateHeader.contains(")")) {
+            int start = dateHeader.indexOf('(');
+            int end = dateHeader.indexOf(')');
+            return dateHeader.substring(start + 1, end);
+        }
+        
+        return dateHeader; // Return as is if not in expected format
     }
     
     // Helper method to extract date from column header like "Day 1 (05/01/2026)"
