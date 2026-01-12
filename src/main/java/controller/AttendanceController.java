@@ -6,7 +6,6 @@ import java.util.List;
 import model.AttendanceFilter;
 import model.AttendanceProcessor;
 import model.AttendanceSummary;
-import model.EmailRecord;
 import model.EmailSender;
 import model.Employee;
 import model.ExcelProcessor;
@@ -42,7 +41,7 @@ public class AttendanceController {
             String day2Date = employees.get(0).getDay2Date();
             
             this.emailSender = new EmailSender(smtpHost, smtpPort, senderEmail, senderPassword);
-            this.emailContent = emailSender.generateAttendanceSummaryEmailWithDates(attendanceSummary, day1Date, day2Date);
+            this.emailContent = emailSender.generateAttendanceSummaryEmailWithDates(attendanceSummary, day1Date, day2Date, employees);
         }
         
         return this.employees;
@@ -56,7 +55,7 @@ public class AttendanceController {
             String day2Date = employees.get(0).getDay2Date();
             
             this.emailSender = new EmailSender(smtpHost, smtpPort, senderEmail, senderPassword);
-            this.emailContent = emailSender.generateAttendanceSummaryEmailWithDates(attendanceSummary, day1Date, day2Date);
+            this.emailContent = emailSender.generateAttendanceSummaryEmailWithDates(attendanceSummary, day1Date, day2Date, employees);
         }
         
         return this.emailContent;
@@ -85,26 +84,9 @@ public class AttendanceController {
     
     
     public void updateMasterSheet() throws IOException {
-        if (attendanceSummary != null && emailContent != null) {
-            // Create an email record for the master sheet
-            EmailRecord record = new EmailRecord();
-            record.setDate(java.time.LocalDate.now().toString());
-            record.setDay1PresentCount(attendanceSummary.getDay1PresentCount());
-            record.setDay1AbsentCount(attendanceSummary.getDay1AbsentCount());
-            record.setDay1AbsentNames(attendanceSummary.getDay1AbsentNames());
-            record.setDay2PresentCount(attendanceSummary.getDay2PresentCount());
-            record.setDay2AbsentCount(attendanceSummary.getDay2AbsentCount());
-            record.setDay2AbsentNames(attendanceSummary.getDay2AbsentNames());
-            record.setEmailContent(emailContent);
-            
-            // Set date strings if available from the first employee
-            if (!employees.isEmpty()) {
-                record.setDay1DateString(employees.get(0).getDay1Date());
-                record.setDay2DateString(employees.get(0).getDay2Date());
-            }
-
-            // Insert the email summary in the exact format starting from row 10 in Column A
-            excelProcessor.insertEmailSummaryIntoExistingSheet(record, "master_attendance_summary.xlsx", 10);
+        if (employees != null && !employees.isEmpty()) {
+            // Add employee data to the master sheet in tabular format
+            excelProcessor.addEmployeeDataToMasterSheet(employees, "master_attendance_summary.xlsx");
         }
     }
     

@@ -21,13 +21,16 @@ public class Employee {
     private String day2Date;
     private List<String> allDateAttendances;
     private List<String> allDateHeaders;
-    
+    private java.util.Map<String, String> dynamicFields;
+
     public Employee() {
         this.allDateAttendances = new ArrayList<>();
         this.allDateHeaders = new ArrayList<>();
+        this.dynamicFields = new java.util.HashMap<>();
     }
-    
-    public Employee(int srNo, String name, String contactNo, String day1Attendance, String day2Attendance, String day1Date, String day2Date) {
+
+    public Employee(int srNo, String name, String contactNo, String day1Attendance, String day2Attendance,
+            String day1Date, String day2Date) {
         this.srNo = srNo;
         this.name = name;
         this.contactNo = contactNo;
@@ -37,145 +40,161 @@ public class Employee {
         this.day2Date = day2Date;
         this.allDateAttendances = new ArrayList<>();
         this.allDateHeaders = new ArrayList<>();
+        this.dynamicFields = new java.util.HashMap<>();
     }
-    
+
     // Getters and Setters
     public int getSrNo() {
         return srNo;
     }
-    
+
     public void setSrNo(int srNo) {
         this.srNo = srNo;
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public void setName(String name) {
         this.name = name;
     }
-    
+
     public String getContactNo() {
         return contactNo;
     }
-    
+
     public void setContactNo(String contactNo) {
         this.contactNo = contactNo;
     }
-    
+
     public String getDay1Attendance() {
         return day1Attendance;
     }
-    
+
     public void setDay1Attendance(String day1Attendance) {
         this.day1Attendance = day1Attendance;
     }
-    
+
     public String getDay2Attendance() {
         return day2Attendance;
     }
-    
+
     public void setDay2Attendance(String day2Attendance) {
         this.day2Attendance = day2Attendance;
     }
-    
+
     public String getDay1Date() {
         return day1Date;
     }
-    
+
     public void setDay1Date(String day1Date) {
         this.day1Date = day1Date;
     }
-    
+
     public String getDay2Date() {
         return day2Date;
     }
-    
+
     public void setDay2Date(String day2Date) {
         this.day2Date = day2Date;
     }
-    
+
     public String getPNo() {
         return pNo;
     }
-    
+
     public void setPNo(String pNo) {
         this.pNo = pNo;
     }
-    
+
     public String getGender() {
         return gender;
     }
-    
+
     public void setGender(String gender) {
         this.gender = gender;
     }
-    
+
     public String getTrade() {
         return trade;
     }
-    
+
     public void setTrade(String trade) {
         this.trade = trade;
     }
-    
+
     public String getMobileNo() {
         return mobileNo;
     }
-    
+
     public void setMobileNo(String mobileNo) {
         this.mobileNo = mobileNo;
     }
-    
+
     public String getPreTest() {
         return preTest;
     }
-    
+
     public void setPreTest(String preTest) {
         this.preTest = preTest;
     }
-    
+
     public String getPostTest() {
         return postTest;
     }
-    
+
     public void setPostTest(String postTest) {
         this.postTest = postTest;
     }
-    
+
     public String getReExam() {
         return reExam;
     }
-    
+
     public void setReExam(String reExam) {
         this.reExam = reExam;
     }
-    
+
     public String getDeployShop() {
         return deployShop;
     }
-    
+
     public void setDeployShop(String deployShop) {
         this.deployShop = deployShop;
     }
-    
+
     public List<String> getAllDateAttendances() {
         return allDateAttendances;
     }
-    
+
     public void setAllDateAttendances(List<String> allDateAttendances) {
         this.allDateAttendances = allDateAttendances;
     }
-    
+
     public List<String> getAllDateHeaders() {
         return allDateHeaders;
     }
-    
+
     public void setAllDateHeaders(List<String> allDateHeaders) {
         this.allDateHeaders = allDateHeaders;
     }
-    
+
+    public java.util.Map<String, String> getDynamicFields() {
+        return dynamicFields;
+    }
+
+    public void setDynamicFields(java.util.Map<String, String> dynamicFields) {
+        this.dynamicFields = dynamicFields;
+    }
+
+    public void addDynamicField(String key, String value) {
+        if (this.dynamicFields == null) {
+            this.dynamicFields = new java.util.HashMap<>();
+        }
+        this.dynamicFields.put(key, value);
+    }
+
     @Override
     public String toString() {
         return "Employee{" +
@@ -196,6 +215,7 @@ public class Employee {
                 ", day2Date='" + day2Date + '\'' +
                 ", allDateAttendances=" + allDateAttendances +
                 ", allDateHeaders=" + allDateHeaders +
+                ", dynamicFields=" + dynamicFields +
                 '}';
     }
 }

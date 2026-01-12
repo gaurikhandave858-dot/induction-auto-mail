@@ -84,6 +84,26 @@
                 <configuration>
                     <mainClass>Main</mainClass>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>main</id>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>Main</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>initialize-master-sheet</id>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>InitializeMasterSheet</mainClass>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
