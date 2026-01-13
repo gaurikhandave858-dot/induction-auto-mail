@@ -692,12 +692,12 @@ public class ExcelProcessor {
 
     /**
      * Adds employee data to the master sheet in tabular format with required
-     * columns
+     * 19-column structure
      */
     public void addEmployeeDataToMasterSheet(List<Employee> employees, String masterFilePath) throws IOException {
         FileInputStream fis;
         Workbook workbook;
-
+        
         // Try to load existing workbook, create new one if it doesn't exist
         try {
             fis = new FileInputStream(masterFilePath);
@@ -718,88 +718,153 @@ public class ExcelProcessor {
                 workbook = new HSSFWorkbook();
             }
         }
-
+        
         Sheet sheet = workbook.getSheetAt(0);
-
+        
         // If sheet doesn't exist, create one
         if (sheet == null) {
             sheet = workbook.createSheet("AttendanceSummary");
         }
-
+        
         // Get or create a bold font style
         Font boldFont = workbook.createFont();
         boldFont.setBold(true);
         CellStyle boldStyle = workbook.createCellStyle();
         boldStyle.setFont(boldFont);
-
+        
         // Check if the header row already exists
         boolean headerExists = false;
-        List<String> masterHeaders = new ArrayList<>();
-
         if (sheet.getLastRowNum() >= 0) {
             Row firstRow = sheet.getRow(0);
-            if (firstRow != null && !isRowEmpty(firstRow)) {
+            if (firstRow != null && firstRow.getCell(0) != null && 
+                getCellValueAsString(firstRow.getCell(0)).toLowerCase().contains("sr no")) {
                 headerExists = true;
-                // Read existing master headers
-                for (Cell cell : firstRow) {
-                    masterHeaders.add(getCellValueAsString(cell).trim());
-                }
             }
         }
-
+        
         int currentRow = 0;
-
+        
         // Create or find the header row
         if (!headerExists) {
             Row headerRow = sheet.createRow(currentRow++);
-
-            // Use the last headers captured from the source file
-            if (this.lastHeaders != null && !this.lastHeaders.isEmpty()) {
-                masterHeaders.addAll(this.lastHeaders);
-            } else {
-                // Fallback if no headers captured (shouldn't happen if readAttendanceData was
-                // called)
-                // Or we can default to some standard headers
-                masterHeaders.add("Sr No");
-                masterHeaders.add("Name");
-                masterHeaders.add("Trade");
-                masterHeaders.add("Date");
-            }
-
-            for (int i = 0; i < masterHeaders.size(); i++) {
+            
+            // Set up the master sheet headers according to requirements
+            String[] headers = {
+                "Sr No", "P No", "Name", "Gender", "Induction Month", "Induction Week", 
+                "Induction Start Date", "Induction End Date", "Induction Day 1", 
+                "Induction Day 2", "Induction Day 3", "Induction Total HRS", 
+                "Pre-Test", "Induction Marks", "Induction Re-Exam", 
+                "Induction Total", "Exam Status", "Shop"
+            };
+            
+            for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
-                cell.setCellValue(masterHeaders.get(i));
+                cell.setCellValue(headers[i]);
                 cell.setCellStyle(boldStyle);
             }
         } else {
             // If header exists, start from the next available row
             currentRow = sheet.getLastRowNum() + 1;
         }
-
+        
         // Add employee data to the sheet
         for (Employee emp : employees) {
             Row row = sheet.createRow(currentRow++);
-
-            // For each column in the master sheet, find the value from the employee
-            for (int i = 0; i < masterHeaders.size(); i++) {
-                String header = masterHeaders.get(i);
-                String value = "";
-
-                // Try to get from dynamic fields first (exact match)
-                if (emp.getDynamicFields().containsKey(header)) {
-                    value = emp.getDynamicFields().get(header);
-                } else {
-                    // Fallback to standard bean properties if needed, or try case-insensitive match
-                    // Since we populated dynamicFields with ALL columns from source, we should find
-                    // it if it was in source.
-                    // If the master sheet has a column that was NOT in the source, we leave it
-                    // blank.
-                }
-
-                row.createCell(i).setCellValue(value);
+            
+            // Map employee data to the appropriate columns based on what's available in source
+            // Only set values that exist in the source data, leave others empty
+            
+            // Sr No
+            if (emp.getSrNo() != 0) {
+                row.createCell(0).setCellValue(emp.getSrNo());
+            } else {
+                row.createCell(0).setCellValue("");
+            }
+            
+            // P No
+            if (emp.getPNo() != null && !emp.getPNo().isEmpty()) {
+                row.createCell(1).setCellValue(emp.getPNo());
+            } else {
+                row.createCell(1).setCellValue("");
+            }
+            
+            // Name
+            if (emp.getName() != null && !emp.getName().isEmpty()) {
+                row.createCell(2).setCellValue(emp.getName());
+            } else {
+                row.createCell(2).setCellValue("");
+            }
+            
+            // Gender
+            if (emp.getGender() != null && !emp.getGender().isEmpty()) {
+                row.createCell(3).setCellValue(emp.getGender());
+            } else {
+                row.createCell(3).setCellValue("");
+            }
+            
+            // Induction Month (not in source data)
+            row.createCell(4).setCellValue("");
+            
+            // Induction Week (not in source data)
+            row.createCell(5).setCellValue("");
+            
+            // Induction Start Date (not in source data)
+            row.createCell(6).setCellValue("");
+            
+            // Induction End Date (not in source data)
+            row.createCell(7).setCellValue("");
+            
+            // Induction Day 1 (attendance)
+            if (emp.getDay1Attendance() != null && !emp.getDay1Attendance().isEmpty()) {
+                row.createCell(8).setCellValue(emp.getDay1Attendance());
+            } else {
+                row.createCell(8).setCellValue("");
+            }
+            
+            // Induction Day 2 (attendance)
+            if (emp.getDay2Attendance() != null && !emp.getDay2Attendance().isEmpty()) {
+                row.createCell(9).setCellValue(emp.getDay2Attendance());
+            } else {
+                row.createCell(9).setCellValue("");
+            }
+            
+            // Induction Day 3 (not in source data, but could be added if more dates exist)
+            row.createCell(10).setCellValue("");
+            
+            // Induction Total HRS (not in source data)
+            row.createCell(11).setCellValue("");
+            
+            // Pre-Test
+            if (emp.getPreTest() != null && !emp.getPreTest().isEmpty()) {
+                row.createCell(12).setCellValue(emp.getPreTest());
+            } else {
+                row.createCell(12).setCellValue("");
+            }
+            
+            // Induction Marks (not in source data)
+            row.createCell(13).setCellValue("");
+            
+            // Induction Re-Exam
+            if (emp.getReExam() != null && !emp.getReExam().isEmpty()) {
+                row.createCell(14).setCellValue(emp.getReExam());
+            } else {
+                row.createCell(14).setCellValue("");
+            }
+            
+            // Induction Total (not in source data)
+            row.createCell(15).setCellValue("");
+            
+            // Exam Status (not in source data)
+            row.createCell(16).setCellValue("");
+            
+            // Shop
+            if (emp.getDeployShop() != null && !emp.getDeployShop().isEmpty()) {
+                row.createCell(17).setCellValue(emp.getDeployShop());
+            } else {
+                row.createCell(17).setCellValue("");
             }
         }
-
+        
         // Write to file
         try (FileOutputStream fileOut = new FileOutputStream(masterFilePath)) {
             workbook.write(fileOut);

@@ -8,6 +8,7 @@ model\AttendanceFilter.class
 model\AttendanceFilter$AbsenteeismType.class
 model\EmailSender.class
 view\AttendanceEmailFrame$3.class
+ClearMasterSheet.class
 controller\AttendanceController.class
 Main.class
 model\AttendanceProcessor.class

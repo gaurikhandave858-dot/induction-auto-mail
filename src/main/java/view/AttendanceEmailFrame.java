@@ -280,6 +280,14 @@ public class AttendanceEmailFrame extends JFrame {
             // Populate legacy table
             populateEmailTableFromEmployees(employees);
 
+            // Update master sheet with processed data
+            try {
+                controller.updateMasterSheet();
+                txtResult.append("Master sheet updated successfully with employee data\n");
+            } catch (Exception ex) {
+                txtResult.append("Error updating master sheet: " + ex.getMessage() + "\n");
+            }
+
             btnSendEmail.setEnabled(true);
 
         } catch (Exception ex) {
@@ -329,6 +337,8 @@ public class AttendanceEmailFrame extends JFrame {
             } else {
                 txtResult.append("Failed to send self email.\n");
             }
+
+            // Note: Master sheet was already updated after processing attendance data
 
         } else {
             txtResult.append("Failed to send email.\n");

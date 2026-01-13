@@ -103,6 +103,15 @@
                             <mainClass>InitializeMasterSheet</mainClass>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>clear-master-sheet</id>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>ClearMasterSheet</mainClass>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
