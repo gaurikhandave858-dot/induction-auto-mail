@@ -73,7 +73,7 @@ public class AttendanceEmailFrame extends JFrame {
         btnBrowse = new JButton("Browse Attendance File");
         btnBrowse.setFont(new Font("Segoe UI", Font.BOLD, 16));
         btnBrowse.setBackground(secondaryColor);
-        btnBrowse.setForeground(Color.WHITE);
+        btnBrowse.setForeground(Color.BLACK);
         btnBrowse.setFocusPainted(false);
         btnBrowse.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createRaisedBevelBorder(),
@@ -89,7 +89,7 @@ public class AttendanceEmailFrame extends JFrame {
         btnProcess = new JButton("Process Summary Email");
         btnProcess.setFont(new Font("Segoe UI", Font.BOLD, 16));
         btnProcess.setBackground(accentColor);
-        btnProcess.setForeground(Color.WHITE);
+        btnProcess.setForeground(Color.BLACK);
         btnProcess.setFocusPainted(false);
         btnProcess.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createRaisedBevelBorder(),
@@ -105,7 +105,7 @@ public class AttendanceEmailFrame extends JFrame {
         btnSendEmail = new JButton("Send Email");
         btnSendEmail.setFont(new Font("Segoe UI", Font.BOLD, 16));
         btnSendEmail.setBackground(primaryColor);
-        btnSendEmail.setForeground(Color.WHITE);
+        btnSendEmail.setForeground(Color.BLACK);
         btnSendEmail.setFocusPainted(false);
         btnSendEmail.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createRaisedBevelBorder(),
@@ -279,7 +279,7 @@ public class AttendanceEmailFrame extends JFrame {
         JButton btnApplyStatusFilter = new JButton("Apply Status Filter");
         btnApplyStatusFilter.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnApplyStatusFilter.setBackground(secondaryColor);
-        btnApplyStatusFilter.setForeground(Color.WHITE);
+        btnApplyStatusFilter.setForeground(Color.BLACK);
         btnApplyStatusFilter.setFocusPainted(false);
         btnApplyStatusFilter.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnApplyStatusFilter.setPreferredSize(new Dimension(170, 35));
@@ -316,7 +316,7 @@ public class AttendanceEmailFrame extends JFrame {
         JButton btnApplyAbsenteeismFilter = new JButton("Apply Absenteeism Filter");
         btnApplyAbsenteeismFilter.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnApplyAbsenteeismFilter.setBackground(accentColor);
-        btnApplyAbsenteeismFilter.setForeground(Color.WHITE);
+        btnApplyAbsenteeismFilter.setForeground(Color.BLACK);
         btnApplyAbsenteeismFilter.setFocusPainted(false);
         btnApplyAbsenteeismFilter.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnApplyAbsenteeismFilter.setPreferredSize(new Dimension(200, 35));
