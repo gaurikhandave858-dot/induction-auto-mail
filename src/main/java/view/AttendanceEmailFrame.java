@@ -49,6 +49,7 @@ public class AttendanceEmailFrame extends JFrame {
         setTitle("Automated Attendance Tracking and Email Reporting System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1200, 900);
+        setMinimumSize(new Dimension(1200, 900));
         setLocationRelativeTo(null); // Center the window
         getContentPane().setBackground(backgroundColor);
 
@@ -347,6 +348,8 @@ public class AttendanceEmailFrame extends JFrame {
         resultPanel.setBackground(backgroundColor);
         resultPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         resultPanel.add(resultTabbedPane, BorderLayout.CENTER);
+        resultPanel.setMinimumSize(new Dimension(1200, 300));
+        resultPanel.setPreferredSize(new Dimension(1200, 300));
         
         // Add result panel to the main frame
         add(resultPanel, BorderLayout.SOUTH);
