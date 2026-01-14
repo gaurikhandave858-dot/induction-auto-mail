@@ -76,13 +76,15 @@ public class AttendanceEmailFrame extends JFrame {
         btnBrowse.setForeground(Color.WHITE);
         btnBrowse.setFocusPainted(false);
         btnBrowse.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(secondaryColor.darker(), 1),
+            BorderFactory.createRaisedBevelBorder(),
             BorderFactory.createEmptyBorder(10, 15, 10, 15)
         ));
         btnBrowse.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnBrowse.setContentAreaFilled(true);
         btnBrowse.setOpaque(true);
         btnBrowse.setBorderPainted(true);
+        btnBrowse.setHorizontalAlignment(JButton.CENTER);
+        btnBrowse.setVerticalAlignment(JButton.CENTER);
         
         btnProcess = new JButton("Process Summary Email");
         btnProcess.setFont(new Font("Segoe UI", Font.BOLD, 16));
@@ -90,13 +92,15 @@ public class AttendanceEmailFrame extends JFrame {
         btnProcess.setForeground(Color.WHITE);
         btnProcess.setFocusPainted(false);
         btnProcess.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(accentColor.darker(), 1),
+            BorderFactory.createRaisedBevelBorder(),
             BorderFactory.createEmptyBorder(10, 15, 10, 15)
         ));
         btnProcess.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnProcess.setContentAreaFilled(true);
         btnProcess.setOpaque(true);
         btnProcess.setBorderPainted(true);
+        btnProcess.setHorizontalAlignment(JButton.CENTER);
+        btnProcess.setVerticalAlignment(JButton.CENTER);
         
         btnSendEmail = new JButton("Send Email");
         btnSendEmail.setFont(new Font("Segoe UI", Font.BOLD, 16));
@@ -104,13 +108,15 @@ public class AttendanceEmailFrame extends JFrame {
         btnSendEmail.setForeground(Color.WHITE);
         btnSendEmail.setFocusPainted(false);
         btnSendEmail.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(primaryColor.darker(), 1),
+            BorderFactory.createRaisedBevelBorder(),
             BorderFactory.createEmptyBorder(10, 15, 10, 15)
         ));
         btnSendEmail.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnSendEmail.setContentAreaFilled(true);
         btnSendEmail.setOpaque(true);
         btnSendEmail.setBorderPainted(true);
+        btnSendEmail.setHorizontalAlignment(JButton.CENTER);
+        btnSendEmail.setVerticalAlignment(JButton.CENTER);
         
         txtResult = new JTextArea(20, 70);
         txtResult.setFont(new Font("Consolas", Font.PLAIN, 14));
@@ -278,12 +284,14 @@ public class AttendanceEmailFrame extends JFrame {
         btnApplyStatusFilter.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnApplyStatusFilter.setPreferredSize(new Dimension(170, 35));
         btnApplyStatusFilter.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(secondaryColor.darker(), 1),
+            BorderFactory.createRaisedBevelBorder(),
             BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         btnApplyStatusFilter.setContentAreaFilled(true);
         btnApplyStatusFilter.setOpaque(true);
         btnApplyStatusFilter.setBorderPainted(true);
+        btnApplyStatusFilter.setHorizontalAlignment(JButton.CENTER);
+        btnApplyStatusFilter.setVerticalAlignment(JButton.CENTER);
         gbc2.gridx = 3;
         filterPanel.add(btnApplyStatusFilter, gbc2);
 
@@ -313,12 +321,14 @@ public class AttendanceEmailFrame extends JFrame {
         btnApplyAbsenteeismFilter.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnApplyAbsenteeismFilter.setPreferredSize(new Dimension(200, 35));
         btnApplyAbsenteeismFilter.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(accentColor.darker(), 1),
+            BorderFactory.createRaisedBevelBorder(),
             BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         btnApplyAbsenteeismFilter.setContentAreaFilled(true);
         btnApplyAbsenteeismFilter.setOpaque(true);
         btnApplyAbsenteeismFilter.setBorderPainted(true);
+        btnApplyAbsenteeismFilter.setHorizontalAlignment(JButton.CENTER);
+        btnApplyAbsenteeismFilter.setVerticalAlignment(JButton.CENTER);
         gbc2.gridx = 6;
         filterPanel.add(btnApplyAbsenteeismFilter, gbc2);
 
