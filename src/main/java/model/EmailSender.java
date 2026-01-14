@@ -267,56 +267,26 @@ public class EmailSender {
             }
         }
 
-        // Add OK and NOT OK classification section
+        // Add NOT OK classification section
         emailContent.append("<h3>ATTENDANCE STATUS CLASSIFICATION:</h3>");
         
         // Group employees by attendance status
-        java.util.List<Employee> okEmployees = new java.util.ArrayList<>();
         java.util.List<Employee> notOkEmployees = new java.util.ArrayList<>();
         
         for (Employee emp : employees) {
             String day1Attendance = emp.getDay1Attendance();
             String day2Attendance = emp.getDay2Attendance();
             
-            // Determine if employee is OK (present on both days) or NOT OK (absent on one or both days)
+            // Determine if employee is NOT OK (absent on one or both days)
             boolean isDay1Present = day1Attendance != null && 
                 (day1Attendance.toUpperCase().contains("P") || day1Attendance.toUpperCase().contains("PRESENT"));
             boolean isDay2Present = day2Attendance != null && 
                 (day2Attendance.toUpperCase().contains("P") || day2Attendance.toUpperCase().contains("PRESENT"));
             
-            if (isDay1Present && isDay2Present) {
-                okEmployees.add(emp);
-            } else {
+            if (!(isDay1Present && isDay2Present)) {  // If not present on both days, then NOT OK
                 notOkEmployees.add(emp);
             }
         }
-        
-        // OK Section - Employees present on both days
-        emailContent.append("<h4>OK (Present on Both Days):</h4>");
-        if (!okEmployees.isEmpty()) {
-            emailContent.append("<table style='").append(tableStyle).append("'>");
-            emailContent.append("<tr>");
-            emailContent.append("<th style='").append(thStyle).append("'>Sr. No</th>");
-            emailContent.append("<th style='").append(thStyle).append("'>Name</th>");
-            emailContent.append("<th style='").append(thStyle).append("'>P No</th>");
-            emailContent.append("<th style='").append(thStyle).append("'>Trade/Department</th>");
-            emailContent.append("</tr>");
-            
-            int srNo = 1;
-            for (Employee emp : okEmployees) {
-                emailContent.append("<tr>");
-                emailContent.append("<td style='").append(tdStyle).append("'>").append(srNo++).append("</td>");
-                emailContent.append("<td style='").append(tdStyle).append("'>").append(emp.getName() != null ? emp.getName() : "N/A").append("</td>");
-                emailContent.append("<td style='").append(tdStyle).append("'>").append(emp.getPNo() != null ? emp.getPNo() : "N/A").append("</td>");
-                emailContent.append("<td style='").append(tdStyle).append("'>").append(emp.getTrade() != null ? emp.getTrade() : "N/A").append("</td>");
-                emailContent.append("</tr>");
-            }
-            emailContent.append("</table>");
-        } else {
-            emailContent.append("<p>No employees marked as OK (present on both days)</p>");
-        }
-        
-        emailContent.append("<br>");
         
         // NOT OK Section - Employees absent on one or both days
         emailContent.append("<h4>NOT OK (Absent on One or Both Days):</h4>");
