@@ -1,12 +1,13 @@
 # Automated Attendance Tracking and Email Reporting System
 
-An automated system for processing attendance data from Excel sheets and generating formatted email reports. The system can handle various Excel formats and provides a user-friendly GUI for processing attendance data.
+An automated system for processing attendance data from Excel sheets and generating formatted email reports. The system can handle various Excel formats and provides a user-friendly GUI for processing attendance data. It includes an OK/NOT OK classification feature that automatically categorizes employees based on their attendance (OK = present on both days, NOT OK = absent on one or both days).
 
 ## Features
 
 - **Flexible Excel Processing**: Dynamically detects headers and processes various Excel formats with different column layouts
 - **Attendance Summary**: Calculates present/absent counts for each day
 - **Email Generation**: Creates formatted emails with present/absent statistics and tables of absent students
+- **OK/NOT OK Classification**: Automatically categorizes employees based on attendance (OK = present on both days, NOT OK = absent on one or both days)
 - **Tabular Display**: Shows attendance data in structured tables (SR.NO, NAME, DEPARTMENT)
 - **Master Sheet Management**: Maintains a central record of employee data in a standardized 19-column format
 - **GUI Interface**: User-friendly Swing-based interface with tabbed views for logs, email preview, and table data
@@ -77,6 +78,7 @@ Processed data is stored in a master sheet with the following 19-column structur
 Emails are generated with:
 - Present/absent counts for each day
 - Tables showing absent students with SR.NO, NAME, and DEPARTMENT
+- OK/NOT OK classification section categorizing employees based on attendance (OK = present on both days, NOT OK = absent on one or both days)
 - Proper formatting for readability
 
 ## Dependencies
