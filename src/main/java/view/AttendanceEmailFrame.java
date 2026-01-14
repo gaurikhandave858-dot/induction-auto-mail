@@ -30,6 +30,13 @@ public class AttendanceEmailFrame extends JFrame {
     private JComboBox<String> cmbAttendanceStatus;
     private JComboBox<String> cmbDayFilter;
     private JComboBox<String> cmbAbsenteeismType;
+    
+    // Define color scheme
+    private final Color primaryColor = new Color(32, 102, 148);  // Dark blue
+    private final Color secondaryColor = new Color(0, 150, 199); // Light blue
+    private final Color accentColor = new Color(76, 175, 80);    // Green
+    private final Color backgroundColor = new Color(245, 245, 245); // Light gray
+    private final Color textColor = new Color(33, 33, 33);      // Dark gray
 
     public AttendanceEmailFrame() {
         initializeComponents();
@@ -41,45 +48,92 @@ public class AttendanceEmailFrame extends JFrame {
     private void initializeComponents() {
         setTitle("Automated Attendance Tracking and Email Reporting System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1000, 800);
+        setSize(1200, 900);
         setLocationRelativeTo(null); // Center the window
+        getContentPane().setBackground(backgroundColor);
 
         txtAttendanceFile = new JTextField(50);
-        txtAttendanceFile.setFont(new Font("Arial", Font.BOLD, 16));
+        txtAttendanceFile.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        txtAttendanceFile.setBackground(Color.WHITE);
+        txtAttendanceFile.setForeground(textColor);
+        txtAttendanceFile.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(primaryColor, 2),
+            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
+        
         txtRecipientEmail = new JTextField(50);
-        txtRecipientEmail.setFont(new Font("Arial", Font.BOLD, 16));
+        txtRecipientEmail.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        txtRecipientEmail.setBackground(Color.WHITE);
+        txtRecipientEmail.setForeground(textColor);
+        txtRecipientEmail.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(primaryColor, 2),
+            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
+        
         btnBrowse = new JButton("Browse Attendance File");
-        btnBrowse.setFont(new Font("Arial", Font.BOLD, 16));
-        btnBrowse.setPreferredSize(new Dimension(200, 35));
+        btnBrowse.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btnBrowse.setBackground(secondaryColor);
+        btnBrowse.setForeground(Color.WHITE);
+        btnBrowse.setFocusPainted(false);
+        btnBrowse.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+        btnBrowse.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
         btnProcess = new JButton("Process Summary Email");
-        btnProcess.setFont(new Font("Arial", Font.BOLD, 16));
-        btnProcess.setPreferredSize(new Dimension(200, 35));
+        btnProcess.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btnProcess.setBackground(accentColor);
+        btnProcess.setForeground(Color.WHITE);
+        btnProcess.setFocusPainted(false);
+        btnProcess.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+        btnProcess.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
         btnSendEmail = new JButton("Send Email");
-        btnSendEmail.setFont(new Font("Arial", Font.BOLD, 16));
-        btnSendEmail.setPreferredSize(new Dimension(140, 35));
+        btnSendEmail.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btnSendEmail.setBackground(primaryColor);
+        btnSendEmail.setForeground(Color.WHITE);
+        btnSendEmail.setFocusPainted(false);
+        btnSendEmail.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+        btnSendEmail.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
         txtResult = new JTextArea(20, 70);
-        txtResult.setFont(new Font("Arial", Font.PLAIN, 14));
+        txtResult.setFont(new Font("Consolas", Font.PLAIN, 14));
         txtResult.setEditable(false);
-        txtResult.setEditable(false);
+        txtResult.setBackground(Color.WHITE);
+        txtResult.setForeground(textColor);
         scrollPane = new JScrollPane(txtResult);
+        scrollPane.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createTitledBorder("Activity Log"),
+            BorderFactory.createEmptyBorder(5, 5, 5, 5)
+        ));
 
         previewPane = new JEditorPane();
         previewPane.setContentType("text/html");
         previewPane.setEditable(false);
+        previewPane.setBackground(Color.WHITE);
+        previewPane.setForeground(textColor);
 
         // Initialize table for email content
-        String[] columnNames = { "SR.NO", "NAME", "DEPARTMENT" };
+        String[] columnNames = { "SR.NO", "NAME", "DEPARTMENT", "DAY 1 STATUS", "DAY 2 STATUS" };
         Object[][] data = {};
         emailTable = new JTable(data, columnNames);
-        emailTable.setFont(new Font("Arial", Font.PLAIN, 14));
+        emailTable.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         emailTable.setRowHeight(25);
+        emailTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
+        emailTable.getTableHeader().setBackground(primaryColor);
+        emailTable.getTableHeader().setForeground(Color.WHITE);
+        emailTable.setSelectionBackground(secondaryColor);
+        emailTable.setSelectionForeground(Color.WHITE);
         tableScrollPane = new JScrollPane(emailTable);
+        tableScrollPane.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createTitledBorder("NOT OK Employees Table"),
+            BorderFactory.createEmptyBorder(5, 5, 5, 5)
+        ));
 
         // Create tabbed pane for result display
         resultTabbedPane = new JTabbedPane();
+        resultTabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 14));
         resultTabbedPane.addTab("Log", scrollPane);
         resultTabbedPane.addTab("Email Preview", new JScrollPane(previewPane));
-        resultTabbedPane.addTab("Table View (Legacy)", tableScrollPane);
+        resultTabbedPane.addTab("NOT OK Table", tableScrollPane);
 
         // Make buttons initially disabled until file is selected
         btnProcess.setEnabled(false);
@@ -88,16 +142,35 @@ public class AttendanceEmailFrame extends JFrame {
 
     private void setupLayout() {
         setLayout(new BorderLayout());
+        
+        // Create header panel
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(primaryColor);
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
+        
+        JLabel titleLabel = new JLabel("Attendance Tracking & Email Reporting System");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        titleLabel.setForeground(Color.WHITE);
+        headerPanel.add(titleLabel, BorderLayout.CENTER);
+        
+        add(headerPanel, BorderLayout.NORTH);
 
+        // Main content panel
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        mainPanel.setBackground(backgroundColor);
+        
         // Top panel for file selection
         JPanel topPanel = new JPanel(new GridBagLayout());
+        topPanel.setBackground(backgroundColor);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
 
         gbc.gridx = 0;
         gbc.gridy = 0;
         JLabel lblAttendanceFile = new JLabel("Attendance File:");
-        lblAttendanceFile.setFont(new Font("Arial", Font.BOLD, 16));
+        lblAttendanceFile.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        lblAttendanceFile.setForeground(textColor);
         topPanel.add(lblAttendanceFile, gbc);
 
         gbc.gridx = 1;
@@ -112,13 +185,15 @@ public class AttendanceEmailFrame extends JFrame {
 
         // Middle panel for email recipient
         JPanel middlePanel = new JPanel(new GridBagLayout());
+        middlePanel.setBackground(backgroundColor);
         gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
 
         gbc.gridx = 0;
         gbc.gridy = 0;
         JLabel lblRecipientEmail = new JLabel("Recipient Email:");
-        lblRecipientEmail.setFont(new Font("Arial", Font.BOLD, 16));
+        lblRecipientEmail.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        lblRecipientEmail.setForeground(textColor);
         middlePanel.add(lblRecipientEmail, gbc);
 
         gbc.gridx = 1;
@@ -134,12 +209,20 @@ public class AttendanceEmailFrame extends JFrame {
         gbc.gridx = 3;
         middlePanel.add(btnSendEmail, gbc);
 
-        // Add components to frame
-        add(topPanel, BorderLayout.NORTH);
-        add(middlePanel, BorderLayout.CENTER);
+        // Add panels to main panel
+        mainPanel.add(topPanel, BorderLayout.NORTH);
+        mainPanel.add(middlePanel, BorderLayout.CENTER);
+        
+        // Add main panel to frame
+        add(mainPanel, BorderLayout.CENTER);
 
         // Bottom panel for filters
         JPanel filterPanel = new JPanel(new GridBagLayout());
+        filterPanel.setBackground(backgroundColor);
+        filterPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createTitledBorder("Filter Options"),
+            BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
         GridBagConstraints gbc2 = new GridBagConstraints();
         gbc2.insets = new Insets(5, 5, 5, 5);
 
@@ -147,26 +230,35 @@ public class AttendanceEmailFrame extends JFrame {
         gbc2.gridx = 0;
         gbc2.gridy = 0;
         JLabel lblAttendanceFilter = new JLabel("Attendance Status Filter:");
-        lblAttendanceFilter.setFont(new Font("Arial", Font.BOLD, 14));
+        lblAttendanceFilter.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblAttendanceFilter.setForeground(textColor);
         filterPanel.add(lblAttendanceFilter, gbc2);
 
         String[] statusOptions = { "ALL", "PRESENT", "ABSENT" };
         this.cmbAttendanceStatus = new JComboBox<>(statusOptions);
-        this.cmbAttendanceStatus.setFont(new Font("Arial", Font.PLAIN, 14));
-        this.cmbAttendanceStatus.setPreferredSize(new Dimension(120, 30));
+        this.cmbAttendanceStatus.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        this.cmbAttendanceStatus.setBackground(Color.WHITE);
+        this.cmbAttendanceStatus.setForeground(textColor);
+        this.cmbAttendanceStatus.setPreferredSize(new Dimension(150, 35));
         gbc2.gridx = 1;
         filterPanel.add(this.cmbAttendanceStatus, gbc2);
 
         String[] dayOptions = { "Day 1", "Day 2" };
         this.cmbDayFilter = new JComboBox<>(dayOptions);
-        this.cmbDayFilter.setFont(new Font("Arial", Font.PLAIN, 14));
-        this.cmbDayFilter.setPreferredSize(new Dimension(100, 30));
+        this.cmbDayFilter.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        this.cmbDayFilter.setBackground(Color.WHITE);
+        this.cmbDayFilter.setForeground(textColor);
+        this.cmbDayFilter.setPreferredSize(new Dimension(120, 35));
         gbc2.gridx = 2;
         filterPanel.add(this.cmbDayFilter, gbc2);
 
         JButton btnApplyStatusFilter = new JButton("Apply Status Filter");
-        btnApplyStatusFilter.setFont(new Font("Arial", Font.BOLD, 14));
-        btnApplyStatusFilter.setPreferredSize(new Dimension(150, 30));
+        btnApplyStatusFilter.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btnApplyStatusFilter.setBackground(secondaryColor);
+        btnApplyStatusFilter.setForeground(Color.WHITE);
+        btnApplyStatusFilter.setFocusPainted(false);
+        btnApplyStatusFilter.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnApplyStatusFilter.setPreferredSize(new Dimension(170, 35));
         gbc2.gridx = 3;
         filterPanel.add(btnApplyStatusFilter, gbc2);
 
@@ -174,20 +266,27 @@ public class AttendanceEmailFrame extends JFrame {
         gbc2.gridx = 4;
         gbc2.gridy = 0;
         JLabel lblAbsenteeismFilter = new JLabel("Absenteeism Filter:");
-        lblAbsenteeismFilter.setFont(new Font("Arial", Font.BOLD, 14));
+        lblAbsenteeismFilter.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblAbsenteeismFilter.setForeground(textColor);
         filterPanel.add(lblAbsenteeismFilter, gbc2);
 
         String[] absenteeismOptions = { "ALL", "Absent on Day 1 Only", "Absent on Day 2 Only", "Absent on Both Days",
                 "Absent on Any Day" };
         this.cmbAbsenteeismType = new JComboBox<>(absenteeismOptions);
-        this.cmbAbsenteeismType.setFont(new Font("Arial", Font.PLAIN, 14));
-        this.cmbAbsenteeismType.setPreferredSize(new Dimension(180, 30));
+        this.cmbAbsenteeismType.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        this.cmbAbsenteeismType.setBackground(Color.WHITE);
+        this.cmbAbsenteeismType.setForeground(textColor);
+        this.cmbAbsenteeismType.setPreferredSize(new Dimension(200, 35));
         gbc2.gridx = 5;
         filterPanel.add(this.cmbAbsenteeismType, gbc2);
 
         JButton btnApplyAbsenteeismFilter = new JButton("Apply Absenteeism Filter");
-        btnApplyAbsenteeismFilter.setFont(new Font("Arial", Font.BOLD, 14));
-        btnApplyAbsenteeismFilter.setPreferredSize(new Dimension(180, 30));
+        btnApplyAbsenteeismFilter.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btnApplyAbsenteeismFilter.setBackground(accentColor);
+        btnApplyAbsenteeismFilter.setForeground(Color.WHITE);
+        btnApplyAbsenteeismFilter.setFocusPainted(false);
+        btnApplyAbsenteeismFilter.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnApplyAbsenteeismFilter.setPreferredSize(new Dimension(200, 35));
         gbc2.gridx = 6;
         filterPanel.add(btnApplyAbsenteeismFilter, gbc2);
 
@@ -203,8 +302,8 @@ public class AttendanceEmailFrame extends JFrame {
         
         // Create a separate panel for the result area to avoid layout conflicts
         JPanel resultPanel = new JPanel(new BorderLayout());
-        resultPanel.setBorder(BorderFactory.createTitledBorder("Results & Email Content"));
-        resultPanel.setPreferredSize(new Dimension(1000, 300));
+        resultPanel.setBackground(backgroundColor);
+        resultPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         resultPanel.add(resultTabbedPane, BorderLayout.CENTER);
         
         // Add result panel to the main frame
@@ -442,22 +541,29 @@ public class AttendanceEmailFrame extends JFrame {
         java.util.List<Object[]> tableData = new java.util.ArrayList<>();
 
         for (model.Employee emp : employees) {
-            boolean isAbsent = "A".equalsIgnoreCase(emp.getDay1Attendance()) ||
-                    "A".equalsIgnoreCase(emp.getDay2Attendance());
-            // You can check other days if needed from getAllDateAttendances()
-
-            if (isAbsent) {
+            String day1Attendance = emp.getDay1Attendance();
+            String day2Attendance = emp.getDay2Attendance();
+            
+            // Check if employee is NOT OK (absent on one or both days)
+            boolean isDay1Present = day1Attendance != null && 
+                (day1Attendance.toUpperCase().contains("P") || day1Attendance.toUpperCase().contains("PRESENT"));
+            boolean isDay2Present = day2Attendance != null && 
+                (day2Attendance.toUpperCase().contains("P") || day2Attendance.toUpperCase().contains("PRESENT"));
+            
+            if (!(isDay1Present && isDay2Present)) {  // If not present on both days, then NOT OK
                 String srNo = String.valueOf(emp.getSrNo());
                 String name = emp.getName();
                 String dept = emp.getTrade() != null ? emp.getTrade() : "N/A";
+                String day1Status = day1Attendance != null ? day1Attendance : "N/A";
+                String day2Status = day2Attendance != null ? day2Attendance : "N/A";
 
-                tableData.add(new Object[] { srNo, name, dept });
+                tableData.add(new Object[] { srNo, name, dept, day1Status, day2Status });
             }
         }
 
         // Update the table with the parsed data
         Object[][] data = tableData.toArray(new Object[tableData.size()][]);
-        String[] columnNames = { "SR.NO", "NAME", "DEPARTMENT" };
+        String[] columnNames = { "SR.NO", "NAME", "DEPARTMENT", "DAY 1 STATUS", "DAY 2 STATUS" };
 
         // Create a new table model with the data
         javax.swing.table.DefaultTableModel model = new javax.swing.table.DefaultTableModel(data, columnNames) {
@@ -468,5 +574,14 @@ public class AttendanceEmailFrame extends JFrame {
         };
 
         emailTable.setModel(model);
+        
+        // Adjust column widths
+        if (emailTable.getColumnModel().getColumnCount() > 0) {
+            emailTable.getColumnModel().getColumn(0).setPreferredWidth(40);  // SR.NO
+            emailTable.getColumnModel().getColumn(1).setPreferredWidth(150); // NAME
+            emailTable.getColumnModel().getColumn(2).setPreferredWidth(120); // DEPARTMENT
+            emailTable.getColumnModel().getColumn(3).setPreferredWidth(80);  // DAY 1 STATUS
+            emailTable.getColumnModel().getColumn(4).setPreferredWidth(80);  // DAY 2 STATUS
+        }
     }
 }
