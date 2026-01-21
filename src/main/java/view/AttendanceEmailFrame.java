@@ -426,10 +426,14 @@ public class AttendanceEmailFrame extends JFrame {
 
             // Update master sheet with processed data
             try {
+                txtResult.append("Attempting to update master sheet with " + employees.size() + " employees...\n");
                 controller.updateMasterSheet();
                 txtResult.append("Master sheet updated successfully with employee data\n");
+                txtResult.append("Data transfer to master sheet completed\n");
             } catch (Exception ex) {
                 txtResult.append("Error updating master sheet: " + ex.getMessage() + "\n");
+                txtResult.append("Stack trace: " + ex.getClass().getSimpleName() + "\n");
+                ex.printStackTrace();
             }
 
             btnSendEmail.setEnabled(true);

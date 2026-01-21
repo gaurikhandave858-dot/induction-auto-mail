@@ -84,9 +84,14 @@ public class AttendanceController {
     
     
     public void updateMasterSheet() throws IOException {
+        System.out.println("updateMasterSheet called with " + (employees != null ? employees.size() : 0) + " employees");
         if (employees != null && !employees.isEmpty()) {
+            System.out.println("Calling excelProcessor.addEmployeeDataToMasterSheet with " + employees.size() + " employees");
             // Add employee data to the master sheet in tabular format
             excelProcessor.addEmployeeDataToMasterSheet(employees, "master_attendance_summary.xlsx");
+            System.out.println("Master sheet update completed successfully");
+        } else {
+            System.out.println("No employees to update in master sheet");
         }
     }
     

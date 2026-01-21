@@ -719,10 +719,13 @@ public class ExcelProcessor {
             }
         }
         
-        Sheet sheet = workbook.getSheetAt(0);
+        Sheet sheet;
         
-        // If sheet doesn't exist, create one
-        if (sheet == null) {
+        // Check if any sheets exist
+        if (workbook.getNumberOfSheets() > 0) {
+            sheet = workbook.getSheetAt(0);
+        } else {
+            // If no sheets exist, create one
             sheet = workbook.createSheet("AttendanceSummary");
         }
         
