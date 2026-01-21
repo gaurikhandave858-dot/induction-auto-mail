@@ -694,6 +694,33 @@ public class ExcelProcessor {
      * Adds employee data to the master sheet in tabular format with required
      * 19-column structure
      */
+    private int findFirstEmptyDataRow(Sheet sheet) {
+        // Start from row 1 (after header)
+        for (int rowNum = 1; rowNum <= sheet.getLastRowNum() + 100; rowNum++) { // Check up to 100 rows ahead
+            Row row = sheet.getRow(rowNum);
+            if (row == null) {
+                // Row doesn't exist, so it's empty
+                return rowNum;
+            }
+            
+            // Check if row has any data
+            boolean hasData = false;
+            for (int colNum = 0; colNum < row.getLastCellNum(); colNum++) {
+                Cell cell = row.getCell(colNum);
+                if (cell != null && !getCellValueAsString(cell).trim().isEmpty()) {
+                    hasData = true;
+                    break;
+                }
+            }
+            
+            if (!hasData) {
+                return rowNum;
+            }
+        }
+        // If no empty row found, add after the last row
+        return sheet.getLastRowNum() + 1;
+    }
+    
     public void addEmployeeDataToMasterSheet(List<Employee> employees, String masterFilePath) throws IOException {
         FileInputStream fis;
         Workbook workbook;
@@ -765,10 +792,10 @@ public class ExcelProcessor {
                 cell.setCellValue(headers[i]);
                 cell.setCellStyle(boldStyle);
             }
-        } else {
-            // If header exists, start from the next available row
-            currentRow = sheet.getLastRowNum() + 1;
-        }
+        } 
+        
+        // Find the first empty row after the header for data insertion
+        currentRow = findFirstEmptyDataRow(sheet);
         
         // Add employee data to the sheet
         for (Employee emp : employees) {
