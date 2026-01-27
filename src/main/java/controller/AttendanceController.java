@@ -18,13 +18,10 @@ public class AttendanceController {
     private AttendanceSummary attendanceSummary;
     private String emailContent;
     
-    // Email configuration - these would typically come from a config file or user input
-    private String smtpHost = "smtp.gmail.com"; // Default, should be configurable
-    private String smtpPort = "587";           // Default, should be configurable
-    private static final String SENDER_EMAIL = "gaurikhandave858@gmail.com";
-    private static final String SENDER_APP_PASSWORD = "xyflmraxlagbwiej";
-    private String senderEmail = SENDER_EMAIL;
-    private String senderPassword = SENDER_APP_PASSWORD;
+    private String smtpHost = model.Config.getSmtpHost();
+    private String smtpPort = String.valueOf(model.Config.getSmtpPort());
+    private String senderEmail = model.Config.getSenderEmail();
+    private String senderPassword = model.Config.getSenderAppPassword();
     
     public AttendanceController() {
         this.attendanceProcessor = new AttendanceProcessor();
@@ -83,16 +80,17 @@ public class AttendanceController {
     }
     
     
+    /**
+     * This method has been deprecated as per new system design.
+     * Master sheet storage is now handled separately via Excel button.
+     * The Java application now focuses only on email analysis and reporting.
+     */
+    @Deprecated
     public void updateMasterSheet() throws IOException {
-        System.out.println("updateMasterSheet called with " + (employees != null ? employees.size() : 0) + " employees");
-        if (employees != null && !employees.isEmpty()) {
-            System.out.println("Calling excelProcessor.addEmployeeDataToMasterSheet with " + employees.size() + " employees");
-            // Add employee data to the master sheet in tabular format
-            excelProcessor.addEmployeeDataToMasterSheet(employees, "master_attendance_summary.xlsx");
-            System.out.println("Master sheet update completed successfully");
-        } else {
-            System.out.println("No employees to update in master sheet");
-        }
+        // This functionality has been moved to Excel VBA macro
+        // The Java application now focuses only on email processing
+        System.out.println("Master sheet storage is now handled via Excel button.");
+        System.out.println("This method is deprecated in favor of Excel-based storage.");
     }
     
     // Getters for GUI to access counts
@@ -144,9 +142,28 @@ public class AttendanceController {
     
     // Methods to set email configuration
     public void setEmailConfig(String smtpHost, String smtpPort, String senderEmail, String senderPassword) {
+        model.Config.setSmtpHost(smtpHost);
+        model.Config.setSmtpPort(Integer.parseInt(smtpPort));
+        model.Config.setSenderEmail(senderEmail);
+        model.Config.setSenderAppPassword(senderPassword);
+        
+        // Update instance variables to reflect the changes
         this.smtpHost = smtpHost;
         this.smtpPort = smtpPort;
         this.senderEmail = senderEmail;
         this.senderPassword = senderPassword;
+    }
+    
+    // Getter methods for email configuration
+    public String getSmtpHost() {
+        return smtpHost;
+    }
+    
+    public String getSmtpPort() {
+        return smtpPort;
+    }
+    
+    public String getSenderEmail() {
+        return senderEmail;
     }
 }

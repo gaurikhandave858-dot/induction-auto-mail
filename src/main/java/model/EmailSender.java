@@ -34,6 +34,11 @@ public class EmailSender {
             props.put("mail.smtp.port", smtpPort);
             props.put("mail.smtp.auth", "true");
             props.put("mail.smtp.starttls.enable", "true"); // Enable TLS
+            
+            // Additional properties for better debugging
+            props.put("mail.smtp.connectiontimeout", "10000"); // 10 seconds
+            props.put("mail.smtp.timeout", "10000"); // 10 seconds
+            props.put("mail.smtp.writetimeout", "10000"); // 10 seconds
 
             // Create session with authentication
             Session session = Session.getInstance(props, new javax.mail.Authenticator() {
@@ -41,6 +46,22 @@ public class EmailSender {
                     return new PasswordAuthentication(email, password);
                 }
             });
+
+            // Validate email addresses before sending
+            if (email == null || email.trim().isEmpty()) {
+                System.err.println("Sender email is not configured");
+                return false;
+            }
+            
+            if (password == null || password.trim().isEmpty()) {
+                System.err.println("Sender password is not configured");
+                return false;
+            }
+            
+            if (recipientEmail == null || recipientEmail.trim().isEmpty()) {
+                System.err.println("Recipient email is not provided");
+                return false;
+            }
 
             // Create message
             Message message = new MimeMessage(session);
@@ -57,8 +78,24 @@ public class EmailSender {
             System.out.println("Email sent successfully to: " + recipientEmail);
             return true;
         } catch (MessagingException e) {
+            System.err.println("MessagingException occurred while sending email:");
+            System.err.println("  Exception Type: " + e.getClass().getSimpleName());
+            System.err.println("  Message: " + e.getMessage());
+            
+            // Check for specific error types
+            Throwable cause = e.getCause();
+            if (cause != null) {
+                System.err.println("  Cause: " + cause.getMessage());
+            }
+            
+            // Print stack trace for detailed debugging
             e.printStackTrace();
-            System.err.println("Failed to send email: " + e.getMessage());
+            return false;
+        } catch (Exception e) {
+            System.err.println("General exception occurred while sending email:");
+            System.err.println("  Exception Type: " + e.getClass().getSimpleName());
+            System.err.println("  Message: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }

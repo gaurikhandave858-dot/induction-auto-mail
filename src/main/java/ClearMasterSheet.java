@@ -77,9 +77,10 @@ public class ClearMasterSheet {
                 // Set up the master sheet headers according to requirements
                 String[] headers = {
                     "Sr No", "P No", "Name", "Gender", "Induction Month", "Induction Week", 
-                    "Induction Start Date", "Induction End Date", "Induction Day 1", 
-                    "Induction Day 2", "Induction Day 3", "Induction Total HRS", 
-                    "Pre-Test", "Induction Marks", "Induction Re-Exam", 
+                    "Induction Start Date", "Induction End Date", 
+                    "Joining Date", "Ending Date",
+                    "Induction Day 1", "Induction Day 2", "Induction Day 3", 
+                    "Induction Total HRS", "Pre-Test", "Induction Marks", "Induction Re-Exam", 
                     "Induction Total", "Exam Status", "Shop"
                 };
                 
@@ -88,13 +89,19 @@ public class ClearMasterSheet {
                     cell.setCellValue(headers[i]);
                     cell.setCellStyle(boldStyle);
                 }
+                
+                // Auto-size columns for better readability
+                for (int i = 0; i < headers.length; i++) {
+                    sheet.autoSizeColumn(i);
+                }
             } else {
                 // If header row exists, make sure it has the correct headers
                 String[] headers = {
                     "Sr No", "P No", "Name", "Gender", "Induction Month", "Induction Week", 
-                    "Induction Start Date", "Induction End Date", "Induction Day 1", 
-                    "Induction Day 2", "Induction Day 3", "Induction Total HRS", 
-                    "Pre-Test", "Induction Marks", "Induction Re-Exam", 
+                    "Induction Start Date", "Induction End Date", 
+                    "Joining Date", "Ending Date",
+                    "Induction Day 1", "Induction Day 2", "Induction Day 3", 
+                    "Induction Total HRS", "Pre-Test", "Induction Marks", "Induction Re-Exam", 
                     "Induction Total", "Exam Status", "Shop"
                 };
                 

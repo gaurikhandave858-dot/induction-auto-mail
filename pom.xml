@@ -95,6 +95,15 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>test-master-sheet</id>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>model.TestMasterSheet</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>initialize-master-sheet</id>
                         <goals>
                             <goal>java</goal>
@@ -112,6 +121,25 @@
                             <mainClass>ClearMasterSheet</mainClass>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>test-email</id>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>EmailTest</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>validate-credentials</id>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>CredentialValidator</mainClass>
+                        </configuration>
+                    </execution>
+
                 </executions>
             </plugin>
         </plugins>

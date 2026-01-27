@@ -39,6 +39,7 @@ public class InitializeMasterSheet {
             String[] headers = {
                 "Sr No", "P No", "Name", "Gender", "Batch No", "Grade", 
                 "Induction Month", "Induction Start Date", "Induction End Date", 
+                "Joining Date", "Ending Date",
                 "Induction Day 1", "Induction Day 2", "Induction Day 3", 
                 "Induction Total HRS", "Pre-Test", "Induction Marks", 
                 "Induction Re-Exam", "Induction Total", "Exam Status", "Shop"

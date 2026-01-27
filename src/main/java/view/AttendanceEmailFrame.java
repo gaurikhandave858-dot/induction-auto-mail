@@ -424,17 +424,11 @@ public class AttendanceEmailFrame extends JFrame {
             // Populate legacy table
             populateEmailTableFromEmployees(employees);
 
-            // Update master sheet with processed data
-            try {
-                txtResult.append("Attempting to update master sheet with " + employees.size() + " employees...\n");
-                controller.updateMasterSheet();
-                txtResult.append("Master sheet updated successfully with employee data\n");
-                txtResult.append("Data transfer to master sheet completed\n");
-            } catch (Exception ex) {
-                txtResult.append("Error updating master sheet: " + ex.getMessage() + "\n");
-                txtResult.append("Stack trace: " + ex.getClass().getSimpleName() + "\n");
-                ex.printStackTrace();
-            }
+            // Note: Master sheet storage is now handled separately via Excel button
+            // The Java application now focuses only on email processing
+            txtResult.append("Attendance data processed successfully.\n");
+            txtResult.append("Email ready for sending.\n");
+            txtResult.append("Master sheet storage is now handled via Excel button.\n");
 
             btnSendEmail.setEnabled(true);
 
@@ -486,7 +480,7 @@ public class AttendanceEmailFrame extends JFrame {
                 txtResult.append("Failed to send self email.\n");
             }
 
-            // Note: Master sheet was already updated after processing attendance data
+            // Note: Master sheet storage is now handled separately via Excel button
 
         } else {
             txtResult.append("Failed to send email.\n");

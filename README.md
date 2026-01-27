@@ -16,7 +16,7 @@ An automated system for processing attendance data from Excel sheets and generat
 ## Installation
 
 1. Clone the repository:
-```bash
+```bash 
 git clone https://github.com/gaurikhandave858-dot/induction-auto-mail.git
 ```
 
@@ -32,16 +32,21 @@ mvn clean compile package
 
 ## Usage
 
-1. Run the application:
+1. Configure email settings in `src/main/java/model/Config.java`:
+   - Update `SENDER_EMAIL` with your email address
+   - Update `SENDER_APP_PASSWORD` with your 16-character app password
+   - (For Gmail: Enable 2-factor auth and generate an app password)
+
+2. Run the application:
 ```bash
 mvn exec:java@main
 ```
 
-2. Select an Excel file containing attendance data
-3. Enter recipient email address
-4. Click "Process Summary Email" to analyze the data
-5. Review the email content in the preview tab
-6. Click "Send Email" to send the report
+3. Select an Excel file containing attendance data
+4. Enter recipient email address
+5. Click "Process Summary Email" to analyze the data
+6. Review the email content in the preview tab
+7. Click "Send Email" to send the report
 
 ## Excel Format Support
 
@@ -52,7 +57,14 @@ The system supports various Excel formats and automatically detects:
 
 ## Master Sheet Structure
 
-Processed data is stored in a master sheet with the following 19-column structure:
+The system separates data persistence and email reporting into two independent tasks:
+
+### Data Storage Workflow
+- Attendance data is manually stored into the master Excel sheet using a button embedded in the attendance Excel file.
+- Email analysis and reporting are handled exclusively by the Java Swing application and do not modify the master sheet.
+
+### Master Sheet Format
+The master sheet maintains the following structure:
 - Sr No
 - P No
 - Name
@@ -62,6 +74,8 @@ Processed data is stored in a master sheet with the following 19-column structur
 - Induction Month
 - Induction Start Date
 - Induction End Date
+- Joining Date *(NEW)*
+- Ending Date *(NEW)*
 - Induction Day 1
 - Induction Day 2
 - Induction Day 3
@@ -72,6 +86,8 @@ Processed data is stored in a master sheet with the following 19-column structur
 - Induction Total
 - Exam Status
 - Shop
+
+This design improves data safety, modularity, and maintainability.
 
 ## Email Format
 
@@ -95,6 +111,8 @@ mvn clean package
 ```
 
 The resulting JAR file will be located in the `target` directory with all dependencies included.
+
+
 
 ## License
 
