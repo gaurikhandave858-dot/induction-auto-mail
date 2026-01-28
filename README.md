@@ -32,21 +32,38 @@ mvn clean compile package
 
 ## Usage
 
-1. Configure email settings in `src/main/java/model/Config.java`:
-   - Update `SENDER_EMAIL` with your email address
-   - Update `SENDER_APP_PASSWORD` with your 16-character app password
-   - (For Gmail: Enable 2-factor auth and generate an app password)
+### Email Configuration - Critical Setup Steps
 
-2. Run the application:
+For Gmail, you MUST follow these steps precisely:
+
+1. **Enable 2-Factor Authentication** on your Gmail account
+   - Go to Google Account Settings
+   - Navigate to Security → 2-Step Verification
+   - Turn on 2-Step Verification
+
+2. **Generate a Gmail App Password**
+   - Go to Google Account Settings
+   - Navigate to Security → 2-Step Verification → App passwords
+   - Select "Mail" as the app
+   - Choose your device (can be any, like "Windows Computer")
+   - Google will generate a 16-character app password
+   - **COPY this password immediately** (it won't be shown again)
+
+3. **Configure the Application**
+   - Update `SENDER_EMAIL` with your email address
+   - Update `SENDER_APP_PASSWORD` with your 16-character app password (remove spaces)
+   - Example: If app password shows as `abcd efgh ijkl mnop`, use `abcdefghijklmnop`
+
+4. Run the application:
 ```bash
 mvn exec:java@main
 ```
 
-3. Select an Excel file containing attendance data
-4. Enter recipient email address
-5. Click "Process Summary Email" to analyze the data
-6. Review the email content in the preview tab
-7. Click "Send Email" to send the report
+5. Select an Excel file containing attendance data
+6. Enter recipient email address
+7. Click "Process Summary Email" to analyze the data
+8. Review the email content in the preview tab
+9. Click "Send Email" to send the report
 
 ## Excel Format Support
 
@@ -96,6 +113,31 @@ Emails are generated with:
 - Tables showing absent students with SR.NO, NAME, and DEPARTMENT
 - NOT OK classification section highlighting employees who are absent on one or both days
 - Proper formatting for readability
+
+## Troubleshooting
+
+### Email Authentication Issues
+
+If you encounter "Username and Password not accepted" error:
+- Verify that 2-factor authentication is enabled on your Gmail account
+- Confirm you generated an app password specifically for "Mail"
+- Ensure the app password is exactly 16 characters
+- Make sure you're using the app password, not your regular Gmail password
+- Double-check that the email address in Config.java matches your Gmail account
+
+### Testing Email Configuration
+
+You can test your email configuration separately:
+```bash
+mvn exec:java@test-email
+```
+
+### Validating Credentials
+
+To validate your credentials:
+```bash
+mvn exec:java@validate-credentials
+```
 
 ## Dependencies
 

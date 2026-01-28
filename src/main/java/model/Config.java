@@ -10,8 +10,11 @@ import java.util.List;
 public class Config {
     
     // Email sender configuration
+    // For Gmail: Use App Password (16 characters without spaces), not regular password
+    // Generate at: Google Account → Security → 2-Step Verification → App passwords
     private static String SENDER_EMAIL = "gaurikhandave858@gmail.com";
-    private static String SENDER_APP_PASSWORD = "mnqjxlqixiochbzm";
+    private static String SENDER_APP_PASSWORD = "svqnrozuwssyzilk";
+;
 
     
     // SMTP configuration

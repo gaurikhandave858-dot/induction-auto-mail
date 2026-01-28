@@ -131,6 +131,15 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>manual-updater</id>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>ManualConfigUpdater</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>validate-credentials</id>
                         <goals>
                             <goal>java</goal>
