@@ -131,6 +131,33 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>check-master-structure</id>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>CheckMasterStructure</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>clear-induction-month</id>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>ClearInductionMonth</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>clear-master-data</id>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>ClearMasterData</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>manual-updater</id>
                         <goals>
                             <goal>java</goal>
